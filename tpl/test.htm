@@ -1,0 +1,536 @@
+<?
+ini_set('max_execution_time', '3600');
+ini_set('memory_limit', '1024M'); 
+//<h1>test page</h1><hr>
+
+echo '<pre>';
+
+dump($_SERVER);
+dump($url);
+
+
+
+
+
+
+//print_r( scandir(ABS_PATH.'/www') );
+
+if(file_exists(ABS_PATH.'/www')) print_r('ok');
+else print_r('bad');
+
+
+
+
+
+/*
+$mysql_result = $db -> mysql_qw($query, '%07306%', '%07306%', '%07306%', '%07306%', '%07306%');
+
+if($mysql_result -> num_rows)
+{
+	while($row = $mysql_result -> fetch_assoc())
+	{
+		dump($row);
+	}
+}
+else die('нет данных');
+*/
+
+exit;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+echo '%7B%22externalId%22%3A%22a123%22%2C%22firstName%22%3A%22Tom%22%7D';
+dump( json_decode( urldecode('%7B%22externalId%22%3A%22a123%22%2C%22firstName%22%3A%22Tom%22%7D') ) );
+
+$order = array(
+    'externalId' => 'a123',
+    'firstName' => 'Tom'
+);
+
+dump( urlencode( json_encode($order) ) );
+
+dump('%7B%22externalId%22%3A%22a123%22%2C%22firstName%22%3A%22Tom%22%7D' == urlencode( json_encode($order) ) );
+exit;
+/**/
+
+
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_HEADER, 1); //вывод заголовков
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //не выводить данные сразу в браузер
+curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); //решает проблему с SSL сертификатом
+//curl_setopt($ch, CURLOPT_POST, true); //
+
+/**/
+$headers = array( 
+        "content-type: application/x-www-form-urlencoded"
+    );
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers); //CURLOPT_HTTPHEADER / CURLOPT_HEADER
+/**/
+
+
+/**/
+$array = "tmpl_data=".array(1,2);
+$array = array(
+	'tmpl_data' => array(
+		'module' => 'tenders'
+	)
+);
+$array = "apiKey=QlnRWTTWw9lv3kjxy1A8byjUmBQedYqb".
+		"&hello=world";
+
+curl_setopt($ch, CURLOPT_POSTFIELDS, $array);
+//dump($array);
+/**/
+
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_MAXREDIRS, -1);
+
+
+//curl_setopt($ch, CURLOPT_URL, 'https://www.pricestorm.ru/test');
+curl_setopt($ch, CURLOPT_URL, 'https://www.pricestorm.ru/php/control/backend.php');
+//curl_setopt($ch, CURLOPT_URL, 'https://superposuda.retailcrm.ru/api/v5/orders/create');
+
+$answer = curl_exec($ch);
+dump( $answer );
+
+$str = '{"buffer":"\u043d\u0435 \u0432\u044b\u0431\u0440\u0430\u043d backend \u043c\u043e\u0434\u0443\u043b\u044c\n\u043f\u0435\u0440\u0435\u0445\u0432\u0430\u0447\u0435\u043d\u043e \u0438\u0441\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435\nArray\n(\n)\n","result":null}';
+
+dump( json_decode($str) );
+
+echo json_last_error_msg();
+
+curl_close($ch);
+exit;
+
+?>
+
+
+<script>
+fetch('https://magnus.bovid.ru/gsp/php/control/backend.php')
+	.then(response => response.json())
+	.then(result => console.log(result));
+</script>
+
+
+
+
+
+<?
+exit;
+
+
+
+$data['order']['status'] = 'trouble'; //Статус заказа
+$data['order']['orderType'] = 'fizik'; //Тип заказа
+$data['site'] = 'test'; //Символьный код магазина
+$data['orderMethod'] = 'test'; //Способ оформления
+$data['order']['number'] = '5031986'; //Номер заказа
+$data['order']['lastName'] = 'Сироткин'; //Ф
+$data['order']['firstName'] = 'Георгий'; //И
+$data['order']['patronymic'] = 'Валерьевич'; //О
+$data['prim'] = 'тестовое задание'; //Пользовательское поле
+$data['order']['customerComment'] = 'https://disk.yandex.ru/d/B7PeWUs-dXr0Kg'; //?? Комментарий: ссылка на файл с Вашим кодом данного задания
+
+$data['order']['countryIso'] = 'RUS'; //ISO код страны
+$data['order']['createdAt'] = '2021-08-25'; //Дата оформления заказа
+$data['order']['phone'] = '+79090777177'; //Телефон
+$data['order']['email'] = 'gsirotkin@yandex.ru'; //e-mail
+$data['order']['delivery']['address']['text'] = 'корп. 20-в, Багратионовский проезд, 7, Москва, 121087'; //адрес доставки
+
+$data['contragent']['contragentType'] = 'individual'; //???
+
+$data['order']['items'][] = array(
+	'productName' => 'Маникюрный набор AZ105R Azalita',
+	'initialPrice' => 1250.00, //цена
+	'quantity' => 1, //кол-во
+);
+
+
+
+/*
+$data['order']['delivery']['code'] = '';
+$data['order']['managerId'] = '';
+$data['order']['sourceId'] = '';
+
+$data['order']['payments'][]['type'] = '';
+$data['order']['payments'][]['status'] = '';
+$data['order']['shipmentStore'] = '';
+*/
+
+
+
+
+
+dump($data);
+//exit;
+
+/*отправка данных методом POST*/
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_HEADER, 1); //вывод заголовков
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //не выводить данные сразу в браузер
+curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); //решает проблему с SSL сертификатом
+//curl_setopt($ch, CURLOPT_POST, true); //
+
+/**/
+$headers = array( 
+        "content-type: application/x-www-form-urlencoded"
+    );
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers); //CURLOPT_HTTPHEADER / CURLOPT_HEADER
+/**/
+
+
+/**/
+$array = "apiKey=QlnRWTTWw9lv3kjxy1A8byjUmBQedYqb".
+		"&order=".urlencode( json_encode($data) );
+
+curl_setopt($ch, CURLOPT_POSTFIELDS, $array);
+//dump($array);
+/**/
+
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_MAXREDIRS, -1);
+
+
+curl_setopt($ch, CURLOPT_URL, 'https://www.pricestorm.ru/test');
+//curl_setopt($ch, CURLOPT_URL, 'https://superposuda.retailcrm.ru/api/v5/orders/create');
+
+dump( curl_exec($ch) );
+
+curl_close($ch);
+exit;
+
+
+
+
+
+
+
+
+
+
+//$xml = ABS_PATH.'/files/xml/EA44.xml';
+$xml = ABS_PATH.'/files/xml/EZK2020.xml';
+
+//$xml = ABS_PATH.'/files/xml/ZKP20.xml';
+//$xml = ABS_PATH.'/files/xml/EAP44.xml';
+
+$xml = ABS_PATH.'/files/xml/fksNotificationEA44_0177200000921002847_27238382.xml';
+
+
+$dom = new domDocument;
+$dom -> encoding = CHARSET;
+$dom -> preserveWhiteSpace = false;
+$dom -> loadXML(file_get_contents($xml));
+
+
+function getOKPD($dom)
+{
+	if($node = $dom -> getElementsByTagName('OKPDCode') -> item(0))
+	{
+		return $node -> nodeValue;
+	}
+	else if($node = $dom -> getElementsByTagName('OKPD2') -> item(0))
+	{
+		if($okpd = $node -> getElementsByTagName('code') -> item(0) ) return $okpd -> nodeValue;
+		else if($okpd = $node -> getElementsByTagName('OKPDCode') -> item(0)) return $okpd -> nodeValue;
+	}
+	return null;
+}
+
+
+$result = array();
+$result['eis_num'] = 		$dom -> getElementsByTagName('purchaseNumber') -> item(0) -> nodeValue;
+$result['nomenclature'] = 	$dom -> getElementsByTagName('purchaseObjectInfo') -> item(0) -> nodeValue; //длина?
+
+$result['okpd'] = 			getOKPD($dom);
+
+$result['ktru'] = 			$dom -> getElementsByTagName('KTRU') -> item(0) 
+								? $dom -> getElementsByTagName('KTRU') -> item(0) -> getElementsByTagName('code') -> item(0) -> nodeValue : '';
+$result['customer'] = 		$dom -> getElementsByTagName('fullName') -> item(0) -> nodeValue; //длина?
+$result['customer_inn'] = 	$dom -> getElementsByTagName('INN') -> item(0) -> nodeValue;
+$result['eis_link'] = 		$dom -> getElementsByTagName('href') -> item(0) -> nodeValue;
+$result['etp_link'] = 		$dom -> getElementsByTagName('ETP') -> item(0)
+								? $dom -> getElementsByTagName('ETP') -> item(0) -> getElementsByTagName('url') -> item(0) -> nodeValue : '';
+$result['etp'] = 			$dom -> getElementsByTagName('ETP') -> item(0)
+								? $dom -> getElementsByTagName('ETP') -> item(0) -> getElementsByTagName('name') -> item(0) -> nodeValue : '';
+$result['sum'] = 			$dom -> getElementsByTagName('maxPrice') -> item(0) -> nodeValue; //тип float
+$result['currency'] = 		$dom -> getElementsByTagName('currency') -> item(0)
+								? $dom -> getElementsByTagName('currency') -> item(0) -> getElementsByTagName('code') -> item(0) -> nodeValue : '';
+$result['delivery_place'] = $dom -> getElementsByTagName('deliveryPlace') -> item(0) -> nodeValue; //длина?
+$result['selection_method'] = $dom -> getElementsByTagName('placingWay') -> item(0)
+								? $dom -> getElementsByTagName('placingWay') -> item(0) -> getElementsByTagName('name') -> item(0) -> nodeValue : '';
+$result['selection_code'] = $dom -> getElementsByTagName('placingWay') -> item(0)
+								? $dom -> getElementsByTagName('placingWay') -> item(0) -> getElementsByTagName('code') -> item(0) -> nodeValue : '';
+
+
+//dump($dom -> getElementsByTagName('OKPD2') -> item(0) -> getElementsByTagName('code') -> item(0) -> nodeValue);
+
+$node = $dom -> getElementsByTagName('OKPD2') -> item(0);
+
+
+$r = $node -> getElementsByTagName('code') -> item(0)
+					? $node -> getElementsByTagName('code') -> item(0) -> nodeValue :
+						$node -> getElementsByTagName('OKPDCode') -> item(0) 
+						? $node -> getElementsByTagName('OKPDCode') -> item(0) -> nodeValue : null;
+	
+
+$r = true ? 10 : true ? 25 : 100;	
+	dump( $r );					
+
+/*
+$node = $dom -> getElementsByTagName('href');
+
+
+foreach($node as $v)
+{
+	dump($v);
+}
+*/
+
+dump($result);
+
+
+
+
+
+
+
+
+
+/* нормальный вариант парсинга XML-файлов ЕИС *
+$dom = new domDocument;
+$dom -> encoding = CHARSET;
+$dom -> preserveWhiteSpace = false;
+$dom -> load( ABS_PATH.'/files/test/test_44_3.xml' );
+
+$node = $dom -> getElementsByTagName('purchaseNumber') -> item(0) -> nodeValue;
+
+dump($dom -> getElementsByTagName('purchaseNumber') -> length);
+exit;
+/**/
+
+
+//phpinfo();
+
+
+
+
+
+/* скрипт чтения извещений ЕИС *
+$timer_start = microtime(true);
+
+
+$reader = new EISReader(44);
+$reader -> read();
+dump('Всего извещений по 44-ФЗ: '.$reader -> count_notif);
+
+
+$reader = new EISReader(223);
+$reader -> read();
+dump('Всего извещений по 223-ФЗ: '.$reader -> count_notif);
+
+
+
+Log::write("/log/eis_reader", sprintf("\nвремя выполнения скрипта: %s сек\n------------------\n", round( (microtime(true) - $timer_start), 3)));
+
+dump('Время выполнения скрипта: '.round( (microtime(true) - $timer_start), 3)." сек");
+/**/
+
+
+
+
+
+
+
+
+
+/*
+$simple = new SimpleXMLElement(file_get_contents(ABS_PATH.'/files/test/test.xml'));
+
+$nodes = $simple -> xpath('.');
+
+for($i = 0; $i < count($nodes); $i++) dump($nodes[$i]);
+exit;
+*/
+
+
+
+
+
+
+
+
+
+
+/*работает*
+$simple = new SimpleXMLElement(file_get_contents(ABS_PATH.'/files/test/test_44_2.xml'));
+
+$simple -> registerXPathNamespace('eis', array_values($simple -> getDocNamespaces())[0]);
+
+
+$nodes = $simple -> xpath('//eis:purchaseNumber');
+
+
+dump($nodes);
+
+//dump($simple -> getDocNamespaces());
+//dump($simple -> getNamespaces());
+//dump( array_values($simple -> getDocNamespaces())[0] );
+//dump( array_values($simple -> getNamespaces())[0] );
+
+
+
+//for($i = 0; $i < count($nodes); $i++) dump($nodes[$i]);
+
+exit;
+/**/
+
+
+
+
+
+
+
+
+
+
+/**
+
+$dom = new domDocument;
+
+$dom -> encoding = CHARSET;
+$dom -> preserveWhiteSpace = false;
+
+//парсинг 44-ФЗ
+$dom -> load( ABS_PATH.'/files/test/test_44_1.xml' );
+
+
+$xpath = new DOMXPath( $dom );
+
+$xpath->registerNamespace('ns', "http://zakupki.gov.ru/oos/types/1");
+
+
+$node = $xpath -> query( 'ns:purchaseNumber' ); //номер в ЕИС
+
+
+for($i = 0; $i < $node -> length; $i++) dump($node[$i]);
+exit;
+
+/**/
+
+
+
+
+
+
+
+
+
+
+/* работает, но нужно указывать контекст *
+$dom = new domDocument;
+$dom -> encoding = CHARSET;
+$dom -> preserveWhiteSpace = false;
+
+$dom -> load( ABS_PATH.'/files/test/test_44_1.xml' );
+
+$contextNode = $dom -> getElementsByTagName('fcsNotificationEF') -> item(0);
+
+$xpath = new DOMXPath( $dom );
+
+$xpath->registerNamespace('eis', "http://zakupki.gov.ru/oos/types/1"); //регистрируем URI пространства имён и префикс с объектом DOMXPath
+
+$node = $xpath -> query( 'eis:purchaseNumber', $contextNode ); //номер в ЕИС
+
+for($i = 0; $i < $node -> length; $i++) dump($node[$i]);
+/**/
+?>
+<?php //тестовое задание для superposuda.ru
+/*
+$data['site'] = 'test';
+$data['orderMethod'] = 'test';
+$data['prim'] = 'тестовое задание';
+$data['contragent']['contragentType'] = 'individual';
+$data['order']['status'] = 'trouble';
+$data['order']['orderType'] = 'fizik';
+$data['order']['number'] = '5031986';
+$data['order']['lastName'] = 'Сироткин';
+$data['order']['firstName'] = 'Георгий';
+$data['order']['patronymic'] = 'Валерьевич';
+$data['order']['customerComment'] = 'https://disk.yandex.ru/d/DVpFp4TtRR_4yg';
+$data['order']['countryIso'] = 'RUS';
+$data['order']['createdAt'] = '2021-08-25';
+$data['order']['phone'] = '+79090777177';
+$data['order']['email'] = 'gsirotkin@yandex.ru';
+$data['order']['delivery']['address']['text'] = 'корп. 20-в, Багратионовский проезд, 7, Москва, 121087';
+$data['order']['items'][] = array(
+	'productName' => 'Маникюрный набор AZ105R Azalita',
+	'initialPrice' => 1250.00,
+	'quantity' => 1,
+);
+
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_HEADER, 1);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+$headers = array( 
+        "content-type: application/x-www-form-urlencoded"
+    );
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+$str = "apiKey=QlnRWTTWw9lv3kjxy1A8byjUmBQedYqb".
+		"&order=".urlencode( json_encode($data) );
+
+curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_MAXREDIRS, -1);
+curl_setopt($ch, CURLOPT_URL, 'https://superposuda.retailcrm.ru/api/v5/orders/create');
+//dump( curl_exec($ch) );
+curl_close($ch);
+
+
+*/
+/*ответ сервера
+
+HTTP/1.1 100 Continue
+
+HTTP/1.1 201 Created
+Server: nginx/1.20.0
+Date: Tue, 24 Aug 2021 19:28:24 GMT
+Content-Type: application/json; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: max-age=0, must-revalidate, no-cache, no-store, private
+pragma: no-cache
+expires: -1
+PJAX-PATH: /api/v5/orders/create
+
+{"success":true,"id":84691,"order":{"slug":84691,"id":84691,"number":"i84691","orderType":"fizik","orderMethod":"test","countryIso":"RU","createdAt":"2021-08-24 22:28:24","statusUpdatedAt":"2021-08-24 22:28:24","summ":0,"totalSumm":0,"prepaySum":0,"purchaseSumm":0,"markDatetime":"2021-08-24 22:28:24","call":false,"expired":false,"customer":{"type":"customer","id":74850,"isContact":false,"createdAt":"2021-08-24 22:28:24","vip":false,"bad":false,"site":"test","contragent":{"contragentType":"individual"},"tags":[],"marginSumm":0,"totalSumm":0,"averageSumm":0,"ordersCount":0,"customFields":[],"segments":[],"email":"","phones":[]},"contact":{"type":"customer","id":74850,"isContact":false,"createdAt":"2021-08-24 22:28:24","vip":false,"bad":false,"site":"test","contragent":{"contragentType":"individual"},"tags":[],"marginSumm":0,"totalSumm":0,"averageSumm":0,"ordersCount":0,"customFields":[],"segments":[],"email":"","phones":[]},"contragent":{"contragentType":"individual"},"delivery":{"cost":0,"netCost":0,"address":{}},"site":"test","status":"trouble","items":[],"payments":[{"id":85246,"status":"not-paid","type":"cash","amount":0}],"fromApi":true,"shipmentStore":"osnovnoj","shipped":false,"customFields":[]}}
+
+///////////////
+$str = '{"success":true,"id":84691,"order":{"slug":84691,"id":84691,"number":"i84691","orderType":"fizik","orderMethod":"test","countryIso":"RU","createdAt":"2021-08-24 22:28:24","statusUpdatedAt":"2021-08-24 22:28:24","summ":0,"totalSumm":0,"prepaySum":0,"purchaseSumm":0,"markDatetime":"2021-08-24 22:28:24","call":false,"expired":false,"customer":{"type":"customer","id":74850,"isContact":false,"createdAt":"2021-08-24 22:28:24","vip":false,"bad":false,"site":"test","contragent":{"contragentType":"individual"},"tags":[],"marginSumm":0,"totalSumm":0,"averageSumm":0,"ordersCount":0,"customFields":[],"segments":[],"email":"","phones":[]},"contact":{"type":"customer","id":74850,"isContact":false,"createdAt":"2021-08-24 22:28:24","vip":false,"bad":false,"site":"test","contragent":{"contragentType":"individual"},"tags":[],"marginSumm":0,"totalSumm":0,"averageSumm":0,"ordersCount":0,"customFields":[],"segments":[],"email":"","phones":[]},"contragent":{"contragentType":"individual"},"delivery":{"cost":0,"netCost":0,"address":{}},"site":"test","status":"trouble","items":[],"payments":[{"id":85246,"status":"not-paid","type":"cash","amount":0}],"fromApi":true,"shipmentStore":"osnovnoj","shipped":false,"customFields":[]}}';
+dump( json_decode($str, true) );
+*/
+
+
+
+exit;
+?>

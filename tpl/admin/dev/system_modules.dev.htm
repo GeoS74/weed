@@ -1,0 +1,136 @@
+<!DOCTYPE HTML> 
+<html lang="ru">
+<head>
+  <title><?=PAGE_TITLE?></title>
+  <? include_once ROOT_PATH.'/tpl/common/header.htm'; ?>
+<style>
+#modules_list{margin:20px 20px 20px 40px; list-style:decimal}
+#modules_list li{padding:10px 0;}
+#modules_list span{font-size: 1.5em;}
+</style>
+<script type="text/javascript" src="<?=BASE?>/lib/dev/Elementary.js"></script>
+</head>
+<body>
+<?include_once ROOT_PATH.'/tpl/common/hellouser.htm';?>
+
+<?include_once ROOT_PATH.'/tpl/common/menu.htm';?>
+
+<h1><?=PAGE_TITLE?></h1>
+
+<script>
+let frontend_data = {
+		tmpl_data: {
+			module: '<?=MODULE?>',
+			template: '<?=TMPL_NAME?>',
+			event: 'load',
+		},
+		form_edit: {},
+	};
+
+
+let edit_form = new El('<form>')
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.setData(frontend_data)
+	.on('submit', function(){event.preventDefault()})
+	.on('click', function(){
+		let input = event.target.closest('input');
+		if(!input) return;
+		
+		frontend_data.tmpl_data.event = 'install';
+		frontend_data.form_edit.module = input.dataset.module;
+		edit_form.query();
+	})
+	.render()
+	.render('beforeend', '<ul id="modules_list"></ul>')
+	.query()
+	.setHandler(function(){
+		console.log(this.getVal());
+
+		let val = this.getVal();
+
+		let li = '';
+		for(let i = 0; i < val.main_data.length; i++)
+			li += htmlLi(val.main_data[i]);
+		
+		this.elem.querySelector('#modules_list').innerHTML = li;
+
+
+		function htmlLi(data)
+		{
+			let row = '<li>';
+			let style = data.error ? 'color:red' : '';
+			row += '<span style="'+style+'">'+data.name+'</span>';
+			if(data.error) row += ' ('+data.error+')';
+			
+			if(!data.error && !data.install) row += '<input type="submit" value="Установить" data-module="'+data.name+'" style="margin-left:35px;"/>';
+			else if(!data.error && data.install) row += '<img src="<?=BASE?>/img/ok.png" style="margin-left:25px;"/>';
+			
+			row += '</li>';
+			return row;
+		}
+	})	;
+	
+
+/*
+let edit_form = new El('<form>')
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.setData(frontend_data)
+	.on('submit', function(){event.preventDefault()})
+	.render()
+	.render('beforeend', '<ul id="modules_list"></ul>')
+	.query()
+	.setHandler(function(){
+		console.log(this.getVal());
+		
+		let val = this.getVal();
+
+		if(val.meta_data.event !== 'load') return;
+
+		for(let i = 0; i < val.main_data.length; i++)
+		{
+			new El('<li>', edit_form)
+				.setParentNode(modules_list)
+				.setVal(val.main_data[i])
+				.render()
+				.setHandler(function(){
+					let val = this.model.getVal()
+
+					switch(val.meta_data.event)
+					{
+						case 'load':
+							if(!this.elem.children.length) htmlRow.call(this); break;
+	
+						case 'install':
+							for(let i = 0; i < val.main_data.length; i++)
+							{
+								if(this.value.name === val.main_data[i].name)
+								{
+								}
+							}
+							break;
+					}
+
+					
+				});
+		}
+		
+		function htmlRow()
+		{
+			let row = '';
+			let style = this.value.error ? 'color:red' : '';
+			row += '<span style="'+style+'">'+this.value.name+'</span>';
+			if(this.value.error) row += ' ('+this.value.error+')';
+			
+			if(!this.value.error && !this.value.install) row += '<input type="submit" value="Установить" style="margin-left:35px;"/>';
+			else if(!this.value.error && this.value.install) row += '<img src="<?=BASE?>/img/ok.png" style="margin-left:25px;"/>';
+			
+			this.elem.innerHTML = row;
+		}
+		
+	})
+	;
+*/
+</script>
+
+</body>
+</html>

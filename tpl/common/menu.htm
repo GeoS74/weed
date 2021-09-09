@@ -1,0 +1,10 @@
+<?
+switch($url -> getPath(0))
+{
+	case 'admin': $db_table = 'menu_admin'; break;
+	default: $db_table = 'menu_crm';
+}
+
+$menu = new Menu($db_table, $user);
+echo $menu -> getMenu();
+?>

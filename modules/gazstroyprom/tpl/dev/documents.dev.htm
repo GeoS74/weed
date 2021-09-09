@@ -1,0 +1,1754 @@
+<?
+if($user -> get('rank') === 'admin' || $user -> get('rank') === 'moderator')
+	define('ACCESS_TO_ACTION', true);
+else define('ACCESS_TO_ACTION', false);
+?><!DOCTYPE HTML> 
+<html lang="ru">
+<head>
+  <title><?=PAGE_TITLE?></title>
+  <? include_once ROOT_PATH.'/tpl/common/header.htm'; ?>
+<style>
+/*обрати внимание на эти стили!!!
+
+#content{margin: 20px;}
+#content li{margin: 10px;}
+input[type=text],
+select,
+label{margin-right:8px;}
+*/
+
+
+body{
+  background: no-repeat url("<?=BASE?>/img/fon.jpg");
+  background-size: 100% 100%;
+	background-attachment: fixed;
+  }
+
+
+
+
+
+
+
+
+
+form{margin:0px;}
+
+
+
+/*~~~~~~~~~~~~~~~~~~search form img style~~~~~~~~~~~~~~~~~~*/
+#search_form{margin:20px;}
+
+#search_img{width:15px; cursor:pointer; margin:0 15px 0 10px;}
+#excel_img{float:left; margin:5px 25px 0 0; cursor:pointer;}
+
+#search_form input[type=checkbox]{margin: 0 10px;}
+#search_form label{margin-right: 25px;}
+
+
+
+
+
+
+
+/*~~~~~~~~~~~~~~~~~~add submit style~~~~~~~~~~~~~~~~~~*/
+#add_submit{
+	width:155px;
+	cursor:pointer;
+	text-decoration:underline;
+	font-size:0.9em;
+}
+#add_submit:hover{text-decoration:none;}
+
+
+
+
+
+
+
+/*~~~~~~~~~~~~~~~~~~style~~~~~~~~~~~~~~~~~~*/
+#main{
+	display:inline-block; /*для автоподгона ширины блока по содержимому*/
+	margin:20px;
+	padding-bottom:180px;
+}
+
+.row{
+	clear:both;
+	border:1px solid #BDBDBD;
+	border-bottom:0px;
+	overflow:hidden; /*заставляет div установить свою высоту по содержимому*/
+}
+.row:last-child{border-bottom:1px solid #BDBDBD;}
+
+.row{background:white;}
+.row:nth-child(2n+1){background:#F5F5F5;}
+
+
+.row ul{position:relative; float:left;}
+.row ul:not(.sub) > li{float:left;}
+
+.row ul:not(.opt) li{padding:15px; font-size:0.9em;}
+.row .opt li{padding:15px 10px; width:20px;}
+
+
+
+.opt img,
+.opt input,
+.act input{cursor:pointer;}
+
+
+.sub,
+.act{
+	clear:both;
+	overflow:hidden;
+}
+
+
+.act > input{margin:0px 15px 15px 15px;}
+
+
+
+/*~~~~~~~~~~~~~~~~~~styles for animation sub block~~~~~~~~~~~~~~~~~~*/
+.sub{
+	height:0px;
+	-webkit-transition: height .2s linear;
+	-moz-transition: height .2s linear;
+	-o-transition: height .2s linear;
+	transition: height .2s linear;
+}
+
+
+
+
+
+
+
+/*~~~~~~~~~~~~~~~~~~footer style~~~~~~~~~~~~~~~~~~*/
+#footer{
+	position:fixed;
+	background:#757575;
+	color: #F5F5F5;
+	width: 100%;
+	z-index: 100500;
+	padding: 20px;
+	
+	/*styles for animation footer*/
+	height: 135px;
+	bottom:-135px;
+	-webkit-transition: bottom .2s linear;
+	-moz-transition: bottom .2s linear;
+	-o-transition: bottom .2s linear;
+	transition: bottom .2s linear;
+}
+
+#footer span{margin:10px; opacity:0.85; cursor:pointer;}
+#footer span:hover{text-decoration:underline; opacity: 1;}
+
+
+
+
+
+
+
+/*~~~~~~~~~~~~~~~~~~filters style~~~~~~~~~~~~~~~~~~*/
+#filters{margin:15px; padding-bottom:15px; overflow:hidden;}
+#filters li{
+	float:left;
+	font-size:0.9em;
+	padding:10px;
+	margin:2px;
+}
+#filters li:not(.active_filter):hover{background:#F5F5F5; cursor:pointer;}
+.active_filter{background:#757575; color:#F5F5F5; cursor:default;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*~~~~~~~~~~~~~~~~~~special styles~~~~~~~~~~~~~~~~~~*/
+#header{background: #757575; color: #F5F5F5; cursor:default;}
+
+
+
+#header .top,
+.sub,
+.act{left:80px;}
+
+
+
+
+
+#search_form input[type=search]{width:350px;}
+
+
+
+.top > li:nth-child(1){width:80px;}
+.top > li:nth-child(2){width:80px;}
+.top > li:nth-child(3){width:200px;}
+.top > li:nth-child(4){width:160px;}
+.top > li:nth-child(5){width:90px;}
+.top > li:nth-child(6){width:250px;}
+.top > li:nth-child(7){width:90px;}
+.top > li:nth-child(8){width:90px;}
+.top > li:nth-child(9){width:50px;}
+
+.row:not(#header) li{line-height: 1.7em;} /*расстояние между строк*/
+
+
+input[name=date_document]{width:70px;}
+input[name=number]{width:70px;}
+input[name=car]{width:190px;}
+input[name=sum]{width:70px;}
+input[name=master]{width:200px;}
+
+
+
+.top > li{border: 0px solid red;}
+.top, .sub, .act{border: 0px solid red;}
+
+
+
+
+
+
+
+
+/*~~~~~~~~~~~~~~~~~~table status history styles~~~~~~~~~~~~~~~~~~*/
+	.sub{width:93%;}
+
+	.sub table {
+	  width: 830px;
+	  float: right;
+	  margin: 20px 0px 50px 0;
+	  border-collapse: collapse;
+	  background: #F5F5F5; color: #424242;
+	  font-size:0.9em;
+	}
+	.sub table td {
+	  padding: 5px;
+	  border: 1px solid grey;
+	  border-collapse: collapse;
+	  line-height: 1.4em;
+	}
+	.sub table td:hover{cursor:default;}
+
+
+	.sub table td:nth-child(1) {width: 140px;}
+	.sub table td:nth-child(2) {width: 150px;}
+	.sub table td:nth-child(3) {width: 120px;}
+
+
+
+/*~~~~~~~~~~~~~~~~~~edit_status_pic styles~~~~~~~~~~~~~~~~~~*/
+.edit_status_pic{width:20px; opacity:0.5;}
+.edit_status_pic:hover{opacity:1; cursor:pointer;}
+
+
+/*~~~~~~~~~~~~~~~~~~for modal forms styles~~~~~~~~~~~~~~~~~~*/
+.modal_block{position:fixed; background:white; z-index:100501; padding:0 20px 30px 20px; border-radius: 15px;}
+
+
+/*~~~~~~~~~~~~~~~~~~change_status_form styles~~~~~~~~~~~~~~~~~~*/
+#status_form input[name=comment_status]{width:350px; margin: 0 15px;}
+
+/*~~~~~~~~~~~~~~~~~~add_files_form styles~~~~~~~~~~~~~~~~~~*/
+#add_f_form{width:600px;}
+#add_f_form input[type=text]{width:300px; margin: 0 0 20px 0;}
+.add_files_button{color:#3F51B5; cursor:pointer; font-size:0.9em;}
+.add_files_button:hover{color:red;}
+
+/*~~~~~~~~~~~~~~~~~~edit_files_form styles~~~~~~~~~~~~~~~~~~*/
+#edit_f_form{width:450px;}
+#edit_f_form input[type=text]{width:300px; margin: 0 0 20px 0;}
+.edit_files_button{color:#3F51B5; cursor:pointer; font-size:0.9em; opacity:0.7;}
+.edit_files_button:hover{color:red; opacity:1;}
+.x_button{color:red; cursor:pointer; font-size:1.5em; opacity:0.6; margin-left: 20px;}
+.x_button:hover{opacity:0.8;}
+</style>
+<script type="text/javascript" src="<?=BASE?>/lib/dev/Elementary.js"></script>
+<script type="text/javascript" src="<?=BASE?>/js/class/Graf.js"></script>
+<script type="text/javascript" src="<?=BASE?>/js/class/SystemFunctions.js"></script>
+</head>
+<body>
+<?include_once ROOT_PATH.'/tpl/common/hellouser.htm';?>
+
+<?include_once ROOT_PATH.'/tpl/common/menu.htm';?>
+
+<h1><?=PAGE_TITLE?></h1>
+
+
+
+
+
+
+
+
+<!--BUG`s DETECTED
+
+
+2) при загрузке страницы видно как footer плавно уезжает вниз
+
+4) раскидать права на админку
+
+5) добавить выгрузку Excel
+
+
+
+3) Решено: предустановить выбор компании для пользователей ГСП
+
+1) Решено: инициировать поиск только при нажати Enter
+
+2) Решено: добавить итоговую строку для подсчёта сумм
+
+3) Решено: объект preload не является полностью автономным. метод content.clear() использует вызов preload.render()
+
+1) Решено: добавить в footer удаление записей
+
+- content.clear применяется 2 раза (до запроса поиска и после ответа сервера)
+-->
+
+
+<?
+if($user -> get('rank') === 'admin' || $user -> get('rank') === 'moderator')
+	define('ACCESS_TO_ACTION', true);
+else
+	define('ACCESS_TO_ACTION', false);
+?>
+
+
+<script>let sf = new SystemFunctions();</script>
+
+
+<script>//frontend data for request
+let frontend_data = {
+		tmpl_data: {
+			module: '<?=MODULE?>',
+			template: '<?=TMPL_NAME?>',
+			start: 0,
+			limit: 30,
+			event: 'load',
+		},
+		form_edit: {},
+		form_search: {},
+	};
+</script>
+
+
+
+
+<script>//форма поиска
+let search_form = new El('<form id="search_form" method="post">')
+	.render()
+	.on('submit', function(){
+		event.preventDefault();
+		search_form.query();
+	})
+	.on('input', function(){
+		frontend_data.form_search[event.target.name] = (event.target.type == 'checkbox') ? event.target.checked : event.target.value;
+	});
+
+search_form.filterKey = function(keyCode)
+{
+	switch(keyCode)
+	{
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+		case 20:
+		case 27:
+		case 33:
+		case 34:
+		case 35:
+		case 36:
+		case 37:
+		case 38:
+		case 39:
+		case 40:
+		case 44:
+		case 91:
+		case 92:
+		case 93:
+		case 116:
+		case 144:
+		case 145:
+		case 192:
+			return false;
+			break;
+		default: return true;
+	}
+};
+
+search_form.query = function()
+{
+	frontend_data.tmpl_data.start = 0;
+	frontend_data.tmpl_data.event = 'load';
+	content.clear().query();
+};
+
+//search text
+new El('<input type="search" name="text_search" placeholder="поиск..."/>')
+	.setParentNode(search_form.elem)
+	.render()
+	/*
+	.on('keyup', function(){
+		if(!search_form.filterKey(event.keyCode)) return;
+		search_form.query();
+	})
+	*/
+	.render(null, '<img src="<?=BASE?>/img/search.png" id="search_img" onclick="this.previousElementSibling.focus()"/>');
+
+//checkbox
+new El('<input type="checkbox" name="search_for_num_order" id="ch_1"/>')
+	.setParentNode(search_form.elem)
+	.render()
+	.on('change', function(){
+		search_form.query();
+	})
+	.render(null, '<label for="ch_1">по номеру акта</label>');
+
+
+//checkbox
+new El('<input type="checkbox" name="search_for_num_score" id="ch_3"/>')
+	.setParentNode(search_form.elem)
+	.render()
+	.on('change', function(){
+		search_form.query();
+	})
+	.render(null, '<label for="ch_3">по номеру счёта</label>');
+
+/*поиск по автомобилю не имеет особого смысла, т.к. он взаимоисключаем с номерами документов
+//checkbox
+new El('<input type="checkbox" name="search_for_automobile" id="ch_2"/>')
+	.setParentNode(search_form.elem)
+	.render()
+	.on('change', function(){
+		search_form.query();
+	})
+	.render(null, '<label for="ch_2">по автомобилю</label>');
+*/
+
+<?if($user -> get('company') === 'БОВИД'):?>
+//select
+new El('<select name="search_for_company">')
+	.setParentNode(search_form.elem)
+	.render()
+	.render('beforeend', '<option value="">Выбрать компанию</option>')
+	.setData({tmpl_data: {module: '<?=MODULE?>', template: 'users_company'}})
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.query()
+	.setHandler(function(){
+		new Graf(this.model.getVal())
+			.sortBy('pos')
+			.each(function(){
+				if(this.title === 'БОВИД') return;
+				search_form.elem.querySelector('select[name="search_for_company"]').insertAdjacentHTML('beforeend', '<option value="'+this.title+'">'+this.title+'</option>');
+			});
+	})
+	.on('change', function(){
+		search_form.query();
+	});
+<?endif?>
+</script>
+
+
+
+
+
+<!--фильтры-->
+<ul id="filters">
+	<li id="not_filter" class="active_filter">Нет фильтра</li>
+	<li id="status_1">Поступила заявка</li>
+	<li id="status_2">Ремонт окончен</li>
+	<li id="status_3">Выдано в ОП</li>
+	<li id="status_4">Получено из ОП</li>
+	<li id="status_5">Принято заказчиком</li>
+	<li id="status_6">Отправлен оригинал</li>
+	<li id="status_7">Получен оригинал</li>
+	<li id="status_8">Требует уточнений</li>
+</ul>
+<script>//переключение активного фильтра
+document.body.querySelector('#filters').addEventListener('click', function(){
+	let li = event.target.closest('li');
+	if(!li) return;
+	
+	this.querySelector('.active_filter').classList.remove('active_filter');
+	
+	li.classList.add('active_filter');
+	
+
+	frontend_data.form_search['filter'] = li.getAttribute('id');
+	search_form.query();
+});
+</script>
+
+
+<?if(ACCESS_TO_ACTION):?>
+<script>//кнопка "Добавить запись"
+new El('<p id="add_submit">+ добавить</p>')
+	.render()
+	.on('click', function(){
+		edit_form
+			.setVal({'event':'reset'})
+			.setParentNode(content.elem)
+			.render('afterbegin');
+
+		frontend_data.tmpl_data.event = 'add';
+
+		edit_form.elem.querySelector('.submit_delete').hidden = true;
+		
+		edit_form.elem.querySelector('.opt input').hidden = true;
+
+		edit_form.elem.querySelector('input[name="date_document"]').focus();
+
+		checkState(null, edit_form.elem);
+	});
+</script>
+<?endif?>
+
+
+<div id="main">
+	<div id="header" class="row">
+		<ul class="top">
+			<li>Дата</li>
+			<li>Номер</li>
+			<li>Автомобиль</li>
+			<li>Статус</li>
+			<li>Сумма (с НДС)</li>
+			<li>Скан-копия</li>
+			<li></li><!--править файлы-->
+			<li></li><!--добавить файлы-->
+			<li></li><!--редактировать строку-->
+		</ul>
+	</div>
+</div>
+
+
+
+
+<script>//main container
+let content = new El('<div id="content">')
+	.setParentNode(document.body.querySelector('#main'))
+	.render()
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.setData(frontend_data)
+	.query()
+	<?if(ACCESS_TO_ACTION):?>
+	.on('dblclick', function(){
+		let div = event.target.closest('div.row');
+		if(!div) return;
+
+		let row = content.observers[ div.getAttribute('id') ];
+
+		frontend_data.tmpl_data.event = 'edit';
+
+		row.elem.hidden = true;
+
+		edit_form
+			.setVal({'event':'reset'})
+			.setVal({'event':'fill', 'value':row.value})
+			.setParentNode(row.elem)
+			.render('afterend');
+
+		edit_form.elem.querySelector('.submit_delete').hidden = false;
+		edit_form.elem.querySelector('.opt input').hidden = false;
+
+		checkState(row.elem, edit_form.elem); //перенос состояния sub блока и чекбокса
+	})
+	<?endif?>
+	.setHandler(function(){
+		if(this.model.getVal().access && this.model.getVal().access === 'denied')
+		{
+			location = '<?print_r( sprintf("%s://%s%s/logout", $_SERVER["REQUEST_SCHEME"], $_SERVER["HTTP_HOST"], BASE) )?>';
+			console.log(location);
+			console.log('<?print_r( sprintf("%s://%s%s/logout", $_SERVER["REQUEST_SCHEME"], $_SERVER["HTTP_HOST"], BASE) )?>');
+			return;
+		}
+
+
+
+		let val = this.model.getVal();
+
+
+		//console.log('answer:');
+		//console.log(val);
+
+
+		/*	скорее всего вызов content.clear() в этом месте не нужен,
+			т.к. content.clear() вызывается формой поиска и дублирование после ответа сервера это скорее всего параноя
+			на данный момент я не знаю ни одной ситуации, когда это нужно...
+			
+			if(val.meta_data.event == 'load' && !val.meta_data.start) content.clear();
+		*/
+
+
+		/*это вызывает ошибку при формировании excel
+		if(val.main_data[0] && val.main_data[0].errors) //контроль ошибок
+		{
+			alert(val.main_data[0].errors);
+			return;
+		}
+		*/
+
+
+
+
+		if(val.meta_data.event == 'load' || val.meta_data.event == 'add')
+			for(let key in val.main_data) constructRow.call(this, val.main_data[key]);
+
+
+
+		function constructRow(value_row)
+		{
+			if(!value_row) return;
+
+			//в качестве id для строки используется индекс позиции в массиве подписчиков this.observers
+			let row = new El('<div id="'+this.observers.length+'" class="row">', this);
+
+			row
+				.setParentNode(this.elem)
+				.setVal(value_row)
+				.setHandler(function(){
+
+					let val = this.model.getVal();
+
+					switch(val.meta_data.event)
+					{
+						case 'load':
+							if(!this.elem.children.length) htmlRow.call(this);
+							break;
+						case  'add':
+							if(!this.elem.children.length)
+							{
+								htmlRow.call(this);
+								<?if(ACCESS_TO_ACTION):?>
+								checkState(edit_form.elem, this.elem); //контролировать состояние строк только при добавлении, но не при событии event
+								<?endif?>
+							}
+							break;
+						case 'upload_files':
+						case 'edit_files':
+						case 'del_file':
+						case 'edit':
+							for(let i = 0; i < val.main_data.length; i++)
+							{
+								if(this.value.id == val.main_data[i].id)
+								{
+									/*	клон элемента нужен для переноса состояния чекбокса и sub блока,
+										т.к. вызов htmlRow.call(this) использует innerHTML, что обнулит состояние этих элементов
+									*/
+									let clone = row.elem.cloneNode(true);
+
+									updateValueRow.call(this, val.main_data[i]);
+									htmlRow.call(this);
+
+									checkState(clone, row.elem); //перенос состояния sub блока и чекбокса
+									clone = null;
+									break;
+								}
+							}
+							break;
+						case 'del':
+							for(let i = 0; i < val.main_data.length; i++)
+							{
+								if(this.value.id == val.main_data[i].id)
+								{
+									this.model.detach(this);
+									this.elem.remove();
+									break;
+								}
+							}
+							break;
+					}
+				});
+
+			//при добавлении строка показывается сверху, при подгрузке в конце ленты
+			if(val.meta_data.event == 'add') row.render('afterbegin');
+			else row.render('beforeend');
+		}
+
+		function updateValueRow(new_value)
+		{
+			for(let key in new_value) if(key !== 'date_create') this.value[key] = new_value[key]; //Сервер вернёт новую дату создания, т.к. он возвращает записи не из БД, а из формы, поэтому дата создания обновится при использовании объекта BaseUnit - дату создания не обновлять
+		}
+
+		function htmlRow()
+		{
+			let row = "";
+			row += '<ul class="opt"><li><input type="checkbox"/></li><li><img src="<?=BASE?>/img/double-down.png"/></li></ul>';
+			
+			row += '<ul class="top">';
+			row += '<li>'+sf.getFormatDate((this.value.date_document || ''))+'</li>';
+			row += '<li>'+(this.value.number || '')+'</li>';
+			row += '<li>'+(this.value.car     || '')+'</li>';
+			row += '<li><b>'+(this.value.status   || '')+'</b></li>';
+			row += '<li>'+sf.getTriad((this.value.sum || ''))+'</li>';
+			
+			//скан-копии файлов
+			let link = [];
+			for(let k in this.value.files) link.push('<a href="<?=BASE?>/files/'+this.value.files[k].file_name+'" target="blank">'+this.value.files[k].file_title+'</a>');
+			
+
+			row += '<li>'+link.join('<br>')+'</li>';
+
+			row += '<li>'+ (link.length ? '<span class="edit_files_button">Править файлы</span>' : '') +'</li>'; //править файлы
+			row += '<li><span class="add_files_button">Добавить файлы</span></li>'; //добавить файлы
+			row += '<li><img src="<?=BASE?>/img/edit_note.png" class="edit_status_pic"/></li>'; //редактировать статус
+			row += '</ul>';
+
+
+
+			row += '<ul class="sub">';
+
+
+			//таблица статусов
+			row += '<table>';
+			row += '<tr><td>Статус</td><td>Дата изменения (МСК)</td><td>Пользователь</td><td>Комментарий</td></tr>';
+
+			for(let k in this.value.status_history)
+			{
+				row += '<tr>';
+				row += '<td>'+this.value.status_history[k].status+'</td>';
+				row += '<td>'+sf.getFormatDate(this.value.status_history[k].date_create, 'FULL')+'</td>';
+				row += '<td>'+this.value.status_history[k].user+'</td>';
+				row += '<td>'+this.value.status_history[k].comment+'</td>';
+				row += '</tr>';
+			}
+
+			row += '</table>';
+
+
+
+			row += '<li>Мастер: '+(this.value.master || '')+'</li>';
+			row += '<li>Заказчик: <b>'+(this.value.customer || '')+'</b></li>';
+			row += '<li>---------------------Связанные документы---------------------</li>';
+
+			if(this.value.scores)
+			{
+				for(let i = 0; i < this.value.scores.length; i++)
+					row += '<li>Счёт на оплату: <b>№ '+this.value.scores[i].score_number+' от '+ this.value.scores[i].score_date +'</b></li>';
+			}
+
+
+			if(this.value.sales)
+			{
+				for(let i = 0; i < this.value.sales.length; i++)
+				{
+					row += '<li>Реализация: <b>№ '+this.value.sales[i].sale_number+' от '+ this.value.sales[i].sale_date +'</b></li>';
+
+					if(this.value.sales[i].invoice_number)
+						row += '<li style="margin-left:25px">Счёт-фактура: <b>№ '+this.value.sales[i].invoice_number+' от '+ this.value.sales[i].invoice_date +'</b></li>';
+				}
+			}
+
+			row += '</ul>';
+
+			this.elem.innerHTML = row;
+		}
+	});
+
+
+content.clear = function()
+{
+	this.elem.innerHTML = '';
+
+	/*удаление строк из списка подписчиков
+	//красивый вариант:
+	//	this.observers.splice( this.observers.length-this.elem.querySelectorAll('div.row').length );
+	//т.к. объекты-строки скорее всео попадают в список подписчиков последними, то можно обрезать массив подписчиков, предварительно вычислив индекс первого объекта-строки
+	//возможно это станет проблемой из-за состояния "гонки", т.к. если сервер ответит быстрее, чем все объекты подпишутся на обновления content,
+	//то возможно возникнет ситуация при которой список подписчиков станет таким: [content, row1, row2 ... rowN, anyObject ]
+	//тогда при обрезке массива this.observers, возможно будут удалены подписчики не являющиеся строками
+	//
+	//безпроблемный вариант удаления строк из списка подписчиков:*/
+	for(var i = 0, obs = []; i < this.observers.length; i++)
+	{
+		if(!this.observers[i]) continue; //массив подписчиков может содержать null
+		if(this.observers[i].elem && this.observers[i].elem.getAttribute('id') == i) continue; //здесь используется особенность формирования строк: id строки совпадает с индексом в массиве подписчиков 
+		obs.push(this.observers[i]);
+	}
+	this.observers = obs;
+	
+	preload.render();
+
+	return this;
+};
+</script>
+
+
+<script>//кнопка Excel
+new El('<img src="<?=BASE?>/img/excel.png" id="excel_img">', content)
+	.setParentNode(search_form.elem)
+	.render('afterbegin')
+	.on('click', function(){
+		if( !confirm('Выгрузка данных в файл Excel. Формирование файла будет проходить в фоновом режиме. Дождитесь окончания выполнения запроса. Внимание!!! При большом объёме данных время формирование файла может оказаться значительным.') ) return false; 
+		frontend_data.tmpl_data.event = 'excel';
+		content.query();
+	})
+	.setHandler(function(){
+		if(this.model.getVal().meta_data.event !== 'excel') return;
+		console.log('отдать файл Excel');
+	});
+</script>
+
+
+<script>//фон для модального окна
+let background_layer = new El('<div style="position: fixed; top: 0px; width: 100%; height: 100%; background: rgb(117, 117, 117); z-index: 100500; opacity: 0.5;">')
+	.on('click', function(){
+		change_status_form.setVal({'event':'reset'});
+		add_files_form.setVal({'event':'reset'});
+		edit_files_form.setVal({'event':'reset'});
+	});
+</script>
+
+
+
+
+<script>//форма редактирования файлов
+//вызов формы
+main.addEventListener('click', function(){
+	let span = event.target.closest('.edit_files_button');
+	if(!span) return;
+
+	let row = content.observers[ span.parentElement.parentElement.parentElement.getAttribute('id') ];
+
+	edit_files_form
+		.setVal({'event':'reset'})
+		.setVal({'event':'fill', 'value':row.value})
+		.render();
+
+	background_layer.render();
+	
+	if(row.getVal().files) generateInputFields(row.getVal().files);
+});
+
+let edit_files_form = new El('<form id="edit_f_form" class="modal_block">')
+	.render('afterbegin', '<h1>Редактирование файлов:</h1>')
+	.on('submit', function(){event.preventDefault()})
+	.setHandler(function(){
+		if(this.getVal().event == 'reset')
+		{
+			this.elem.reset();
+			this.elem.remove();
+			background_layer.elem.remove();
+		}
+	});
+
+//позиционирование формы
+edit_files_form.elem.style.left = document.documentElement.clientWidth/4 + 'px';
+edit_files_form.elem.style.top = document.documentElement.clientHeight/4 + 'px';
+
+
+
+
+
+
+
+//генерация полей для загрузки файлов
+function generateInputFields(files)
+{
+	if(!files.length) return;
+
+	for(let i = 0; i < files.length; i++)
+	{
+		//input type=text
+		new El('<input type="text" name="files_name['+files[i].id+']" placeholder="Название файла..." value="'+files[i].file_title+'" />', edit_files_form)
+			.setParentNode(edit_files_form.elem.querySelector('input[type=submit]'))
+			.render('beforebegin')
+			<?if(ACCESS_TO_ACTION):?>
+			.render('afterend', '<span class="x_button" title="удалить файл" data-id="'+files[i].id+'"><b>X</b></span>')
+			<?endif?>
+			.setHandler(function(){
+				if(this.model.getVal().event == 'reset')
+				{
+					<?if(ACCESS_TO_ACTION):?>
+					if(this.elem.nextElementSibling) this.elem.nextElementSibling.remove();
+					<?endif?>
+					this.elem.remove();
+				}
+			});
+	}
+}
+
+edit_files_form.elem.addEventListener('click', function(){
+	let x_button = event.target.closest('.x_button');
+	if(!x_button) return;
+	
+	if( !confirm('Вы действительно хотите удалить этот файл?') ) return;
+
+	frontend_data.form_edit = {
+		'id': edit_files_form.getVal().value.id,
+		'id_del_file': x_button.dataset.id
+	};
+
+	frontend_data.tmpl_data.event = 'del_file';
+
+	content.query();
+	
+	if(x_button.previousElementSibling) x_button.previousElementSibling.remove();
+	x_button.remove();
+	
+	//проверить, есть ли ещё фалы для редактирования
+	if(!edit_files_form.elem.querySelector('input[type=text]')) edit_files_form.setVal({'event':'reset'});
+});
+
+
+//submit
+new El('<input type="submit" value="Сохранить изменения" class="submit_ok"/>')
+	.setParentNode(edit_files_form.elem)
+	.render()
+	.on('click', function(){
+		let fd = new FormData(edit_files_form.elem);
+		
+		fd.append('id', edit_files_form.getVal().value.id);
+
+		frontend_data.form_edit = fd;
+
+		frontend_data.tmpl_data.event = 'edit_files';
+
+		content.query();
+
+		edit_files_form.setVal({'event':'reset'});
+	});
+
+
+new El('<span class="submit_cancel">Отменить<span/>')
+	.setParentNode(edit_files_form.elem)
+	.render()
+	.on('click', function(){
+		edit_files_form.setVal({'event':'reset'});
+	});
+</script>
+
+
+
+
+<script>//форма добавления файлов
+//вызов формы
+main.addEventListener('click', function(){
+	let span = event.target.closest('.add_files_button');
+	if(!span) return;
+
+	let row = content.observers[ span.parentElement.parentElement.parentElement.getAttribute('id') ];
+
+	add_files_form
+		.setVal({'event':'reset'})
+		.setVal({'event':'fill', 'value':row.value})
+		.render();
+
+	background_layer.render();
+	
+	generateUploadFields();
+});
+
+let add_files_form = new El('<form id="add_f_form" class="modal_block">')
+	.render('afterbegin', '<h1>Загрузка файлов:</h1>')
+	.render('beforeend', '<p class="add_files_button">+добавить файл:</p>')
+	.on('submit', function(){event.preventDefault()})
+	.setHandler(function(){
+		if(this.getVal().event == 'reset')
+		{
+			this.elem.reset();
+			this.elem.remove();
+			background_layer.elem.remove();
+			generateUploadFields.count = 0; //сбросить счётчик полей ввода
+		}
+	});
+
+//позиционирование формы
+add_files_form.elem.style.left = document.documentElement.clientWidth/4 + 'px';
+add_files_form.elem.style.top = document.documentElement.clientHeight/4 + 'px';
+
+//добавление полей ввода
+add_files_form.on('click', function(){
+	let span = event.target.closest('.add_files_button');
+	if(!span) return;
+
+	generateUploadFields();
+});
+
+
+//генерация полей для загрузки файлов
+function generateUploadFields()
+{
+	generateUploadFields.count = generateUploadFields.count || 0;
+	generateUploadFields.count++;
+
+	if(generateUploadFields.count > 5) return;
+
+	//input type=text
+	new El('<input type="text" name="files_name[]" placeholder="Название файла..." value="Скан-копия файла"/>', add_files_form)
+		.setParentNode(add_files_form.elem.querySelector('input[type=submit]'))
+		.render('beforebegin')
+		.setHandler(function(){
+			if(this.model.getVal().event == 'reset') this.elem.remove();
+		});
+
+	//input type=file
+	new El('<input type="file" name="files[]"/>', add_files_form)
+		.setParentNode(add_files_form.elem.querySelector('input[type=submit]'))
+		.render('beforebegin')
+		.setHandler(function(){
+			if(this.model.getVal().event == 'reset') this.elem.remove();
+		});
+}
+
+
+//submit
+new El('<input type="submit" value="Загрузить файлы" class="submit_ok"/>')
+	.setParentNode(add_files_form.elem)
+	.render()
+	.on('click', function(){
+		let fd = new FormData(add_files_form.elem);
+		
+		fd.append('id', add_files_form.getVal().value.id);
+
+		frontend_data.form_edit = fd;
+
+		frontend_data.tmpl_data.event = 'upload_files';
+
+		content.query();
+
+		add_files_form.setVal({'event':'reset'});
+	});
+
+
+new El('<span class="submit_cancel">Отменить<span/>')
+	.setParentNode(add_files_form.elem)
+	.render()
+	.on('click', function(){
+		add_files_form.setVal({'event':'reset'});
+	});
+</script>
+
+
+
+<script>//форма изменения статуса
+
+//вызов формы
+main.addEventListener('click', function(){
+	let img = event.target.closest('.edit_status_pic');
+	if(!img) return;
+
+	let row = content.observers[ img.parentElement.parentElement.parentElement.getAttribute('id') ];
+
+	change_status_form
+			.setVal({'event':'reset'})
+			.setVal({'event':'fill', 'value':row.value})
+			.render();
+
+	background_layer.render();
+});
+
+
+let change_status_form = new El('<form id="status_form" class="modal_block">')
+	.render('afterbegin', '<h1>Изменение статуса:</h1>')
+	.on('submit', function(){event.preventDefault()})
+	.setHandler(function(){
+		if(this.getVal().event == 'reset')
+		{
+			this.elem.reset();
+			this.elem.remove();
+			background_layer.elem.remove();
+		}
+	});
+
+//позиционирование формы
+change_status_form.elem.style.left = document.documentElement.clientWidth/4 + 'px';
+change_status_form.elem.style.top = document.documentElement.clientHeight/4 + 'px';
+
+
+new El('<select name="status">', change_status_form)
+	.setParentNode(change_status_form.elem)
+	.render()
+	.render('beforeend', '<option value="поступила заявка">поступила заявка</option>')
+	.render('beforeend', '<option value="ремонт окончен">ремонт окончен</option>')
+	.render('beforeend', '<option value="выдано в ОП">выдано в ОП</option>')
+	.render('beforeend', '<option value="получено из ОП">получено из ОП</option>')
+	.render('beforeend', '<option value="принято заказчиком">принято заказчиком</option>')
+	.render('beforeend', '<option value="отправлен оригинал">отправлен оригинал</option>')
+	.render('beforeend', '<option value="получен оригинал">получен оригинал</option>')
+	.render('beforeend', '<option value="требует уточнений">требует уточнений</option>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			if(this.model.getVal().value.status) this.elem.querySelector('option[value="'+this.model.getVal().value.status+'"]').selected = true;
+
+			//деактивация статусов
+			let options = this.elem.querySelectorAll('option');
+
+			for(let i = 0, disabled = true; i < options.length; i++)
+			{
+				if(this.model.getVal().value.status === options[i].value) disabled = false;
+				if(this.model.getVal().value.status === 'требует уточнений') disabled = false;
+				options[i].disabled = disabled;
+			}
+		}
+		if(this.model.getVal().event == 'reset')
+		{
+			//активация статусов
+			let options = this.elem.querySelectorAll('option');
+
+			for(let i = 0, disabled = true; i < options.length; i++)
+				options[i].disabled = false;
+		}
+	});
+
+
+//input type=text
+new El('<input type="text" name="comment_status" placeholder="Комментарий..."/>')
+	.setParentNode(change_status_form.elem)
+	.render()
+	.render('afterend', '<br><br><br>');
+
+
+/*функция проверяет массовую установку новых статусов
+*	не даёт изменять статусы у тех записей где нарушается линейная последовательность изменений
+*
+*	AHTUNG!!! ninja code
+*/
+function checkStatusChanges(formData)
+{
+	//получить новый статус
+	let new_status = '';
+
+	let iterator = formData.entries();
+	while(true)
+	{
+		let result = iterator.next();
+		if(result.done) break;
+		if(result.value[0] === 'status')
+		{
+			new_status = result.value[1];
+			break;
+		}
+	}
+
+	/*получить список разрешенных статусов
+	*это такие статусы, которые идут по списку до нового статуса, включая новый
+	*
+	*т.е. если текущий статус ПСА стоит до нового его можно изменить
+	*если после, то это нарушение линейности изменения статусов
+	*исключение - статус 'требует уточнений', его нужно добавлять в allowed_status по-умолчанию, т.к.
+	*если этого не сделать и ПСА будет иметь этот статус, тогда он не сможет изменить статус на новый
+	*потому что новый будет ниже по иерархии
+	*/
+	let allowed_status = {'требует уточнений':true};
+
+	let options = change_status_form.elem.querySelectorAll('select[name=status] option');
+	for(let i = 0, f = true; i < options.length; i++)
+	{
+		if(f) allowed_status[options[i].value] = true;
+
+		if(options[i].value === new_status) f = false;
+	}
+
+	//откорректировать список id строк для которых можно изменить статус
+	let rows_id = [];
+
+	for(let k in change_status_form.getVal().rows)
+		if( allowed_status[ change_status_form.getVal().rows[k].getVal().status ] ) rows_id.push(change_status_form.getVal().rows[k].getVal().id);
+
+	if(!rows_id.length) return false;
+
+	change_status_form.setVal({'id': rows_id});
+	
+	return true;
+}
+
+//submit
+new El('<input type="submit" value="Изменить статус" class="submit_ok"/>')
+	.setParentNode(change_status_form.elem)
+	.render()
+	.on('click', function(){
+		let fd = new FormData(change_status_form.elem);
+
+		if(!change_status_form.getVal().value) //изменение статусов у нескольких записей
+		{
+			if(!checkStatusChanges(fd)) //нет записей, для которых возможно изменение статусов
+			{
+				change_status_form.setVal({'event':'reset'});
+				return;
+			}
+			fd.append('id', JSON.stringify(change_status_form.getVal().id));
+		}
+		else fd.append('id', change_status_form.getVal().value.id);
+
+		frontend_data.form_edit = fd;
+
+		frontend_data.tmpl_data.event = 'edit';
+
+		content.query();
+
+		change_status_form.setVal({'event':'reset'});
+	});
+
+
+new El('<span class="submit_cancel">Отменить<span/>')
+	.setParentNode(change_status_form.elem)
+	.render()
+	.on('click', function(){
+		change_status_form.setVal({'event':'reset'});
+	});
+</script>
+
+
+
+
+<?if(ACCESS_TO_ACTION):?>
+<script>//форма редактирования записей
+let edit_form = new El('<form class="row">')
+	.on('submit', function(){event.preventDefault()})
+	.setHandler(function(){
+		if(this.getVal().event == 'reset')
+		{
+			if( this.elem.previousElementSibling )
+			{
+				this.elem.previousElementSibling.hidden = false;
+
+				checkState(this.elem, this.elem.previousElementSibling); //перенос состояния sub блока и чекбокса
+			}
+
+			this.elem.reset();
+			this.elem.remove();
+		}
+	})
+	.render('beforeend', '<ul class="opt"><li><input type="checkbox"/></li><li><img src="<?=BASE?>/img/double-down.png"/></li></ul>')
+	.render('beforeend', '<ul class="top"></ul>')
+	.render('beforeend', '<ul class="sub"></ul>')
+	.render('beforeend', '<ul class="act"></ul>')
+	;
+
+
+//input type=text
+new El('<input type="text" name="date_document"/>', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			this.elem.value = sf.getFormatDate(this.model.getVal().value.date_document) || '';
+		}
+	});
+
+new El('<input type="text" name="number"/>', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			this.elem.value = this.model.getVal().value.number || '';
+		}
+	});
+
+new El('<input type="text" name="car"/>', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			this.elem.value = this.model.getVal().value.car || '';
+		}
+	});
+
+//select
+new El('<select name="status">', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.render('beforeend', '<option value="поступила заявка">поступила заявка</option>')
+	.render('beforeend', '<option value="ремонт окончен">ремонт окончен</option>')
+	.render('beforeend', '<option value="выдано в ОП">выдано в ОП</option>')
+	.render('beforeend', '<option value="получено из ОП">получено из ОП</option>')
+	.render('beforeend', '<option value="принято заказчиком">принято заказчиком</option>')
+	.render('beforeend', '<option value="отправлен оригинал">отправлен оригинал</option>')
+	.render('beforeend', '<option value="получен оригинал">получен оригинал</option>')
+	.render('beforeend', '<option value="требует уточнений">требует уточнений</option>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			if(this.model.getVal().value.status)
+			{
+				this.elem.querySelector('option[value="'+this.model.getVal().value.status+'"]').selected = true;
+			
+				//деактивация статусов
+				let options = this.elem.querySelectorAll('option');
+
+				for(let i = 0, disabled = true; i < options.length; i++)
+				{
+					if(this.model.getVal().value.status === options[i].value) disabled = false;
+					if(this.model.getVal().value.status === 'требует уточнений') disabled = false;
+					options[i].disabled = disabled;
+				}
+				
+				
+				
+				//console.log(Object.keys(options));
+			}
+		}
+	});
+
+
+
+//input type=text
+new El('<input type="text" name="sum"/>', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			this.elem.value = this.model.getVal().value.sum || '';
+		}
+	});
+	
+	
+
+
+
+
+
+
+new El('<input type="text" name="master"/>', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.sub'))
+	.render().wrap('<li>')
+	.render('beforebegin', 'Мастер: ')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			this.elem.value = this.model.getVal().value.master || '';
+		}
+	});
+
+
+
+
+//select
+new El('<select name="customer">', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.sub'))
+	.render().wrap('<li>')
+	.render('beforebegin', 'Заказчик: ')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			if(this.model.getVal().value.customer) this.elem.querySelector('option[value="'+this.model.getVal().value.customer+'"]').selected = true;
+		}
+	});
+
+//выпадающий список рангов пользователей
+new El()
+	.setData({tmpl_data: {module: '<?=MODULE?>', template: 'users_company'}})
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.query()
+	.setHandler(function(){
+		new Graf(this.model.getVal())
+			.sortBy('pos')
+			.each(function(){
+				if(this.title === 'БОВИД') return;
+				edit_form.elem.querySelector('select[name="customer"]').insertAdjacentHTML('beforeend', '<option value="'+this.title+'" '+(this.title =='user'?'selected':'')+'>'+this.title+'</option>');
+			});
+	});
+
+
+
+
+//submit
+new El('<input type="submit" value="Сохранить" class="submit_ok"/>')
+	.setParentNode(edit_form.elem.querySelector('.act'))
+	.render()
+	.on('click', function(){
+		let fd = new FormData(edit_form.elem);
+		if(frontend_data.tmpl_data.event !== 'add') fd.append('id', edit_form.getVal().value.id);
+
+		frontend_data.form_edit = correctData(fd); //корректировка данных
+		content.query();
+		edit_form.setVal({'event':'reset'});
+	});
+
+function correctData(form_data)
+{
+	let iterator = form_data.entries();
+	while(true)
+	{
+		let result = iterator.next();
+		if(result.done) break;
+		
+		switch(result.value[0])
+		{
+			case 'date_document': form_data.set(result.value[0], sf.getMilliSeconds(result.value[1])); break;
+			case 'sum': form_data.set(result.value[0], sf.getDigit(result.value[1])); break;
+		}
+	}
+	return form_data;
+}
+
+
+new El('<span class="submit_cancel">Отменить<span/>')
+	.setParentNode(edit_form.elem.querySelector('.act'))
+	.render()
+	.on('click', function(){
+		edit_form.setVal({'event':'reset'});
+	});
+
+
+new El('<span class="submit_delete">Удалить<span/>')
+	.setParentNode(edit_form.elem.querySelector('.act'))
+	.render()
+	.on('click', function(){
+		if( !confirm('Вы действительно хотите удалить запись?') ) return;
+		frontend_data.tmpl_data.event = 'del';
+		frontend_data.form_edit = {id:edit_form.getVal().value.id};
+		content.query();
+		edit_form.setVal({'event':'reset'});
+	});
+</script>
+<?endif?>
+
+
+
+
+
+
+
+
+
+
+
+<script>//анимация sub блока
+main.addEventListener('click', function(){
+	let img = event.target.closest('.opt img');
+	if(!img) return;
+
+	let sub = img.parentElement.parentElement.parentElement.querySelector('.sub');
+
+	sub.style.height = sub.scrollHeight+'px';
+
+	//window.getComputedStyle заставляет вычислить новые значения стилей для объекта window, иначе анимация не сработает
+	//Читай здесь:  https://developer.mozilla.org/ru/docs/Web/API/Window/getComputedStyle
+	if(window.getComputedStyle(sub, null).height !== '0px')
+	{
+		sub.style.height = '0px';
+		img.src = '<?=BASE?>/img/double-down.png';
+	}
+	else img.src = '<?=BASE?>/img/double-up.png';
+});
+
+//обработчик устанавливает значение auto после завершения анимации
+main.addEventListener('transitionend', function(){
+	let sub = event.target.closest('.sub');
+	if(!sub) return;
+	if(sub.style.height !== '0px') sub.style.height = "auto";
+});
+</script>
+
+
+
+
+
+
+
+<script>//контроль состояний формы и редактируемой строки
+function checkState(from, to)
+{
+	if(from)
+	{
+		to.querySelector('.sub').style.height = from.querySelector('.sub').style.height;
+		to.querySelector('.opt img').src = from.querySelector('.opt img').src;
+		to.querySelector('.opt input').checked = from.querySelector('.opt input').checked;
+	}
+	else
+	{
+		to.querySelector('.sub').style.height = '0px';
+		to.querySelector('.opt img').src = '<?=BASE?>/img/double-down.png';
+		to.querySelector('.opt input').checked = false;
+	}
+}
+</script>
+
+
+
+
+<script>//подсветка активных строк
+function highLighter()
+{
+	let checkbox_not_checked = main.querySelectorAll('.opt input:not(:checked)'),
+		count_checked = main.querySelectorAll('.opt input:checked').length;
+
+	for(let i = 0; i < checkbox_not_checked.length; i++)
+		checkbox_not_checked[i].parentElement.parentElement.parentElement.style.opacity = count_checked ? 0.7 : 1;
+}
+
+main.addEventListener('click', function(){
+	let input = event.target.closest('.opt input');
+	if(!input) return;
+
+	input.parentElement.parentElement.parentElement.style.opacity = input.checked ? 1 : 0.7;
+	highLighter();
+});
+
+content.setThen(highLighter); //highLighter будет выполнена после оповещения всех подписчиков
+</script>
+
+
+
+
+
+
+<script>//строка с итогами
+let total = new El('<div class="row" style="background:white"></div>')
+	.setParentNode(content.elem)
+	.setHandler(function(){
+		this.elem.remove();
+
+		let val = content.getVal();
+
+		let sum = 0;
+
+		switch(val.meta_data.event)
+		{
+			case 'load':
+			case 'add':
+			case 'edit':
+			case 'del':
+				for(let i = 0; i < content.observers.length; i++) 
+					if(content.observers[i] && content.observers[i].elem && content.observers[i].elem.getAttribute('id') == i)
+						sum += sf.getDigit(content.observers[i].getVal().sum);
+				break;
+		}		
+		this.setVal({'sum':sum}, false);
+		
+		htmlTotal.call(this);
+
+		this.render();
+		
+		function htmlTotal()
+		{
+			let row = "";
+			row += '<ul class="opt"><li></li><li></li></ul>';
+
+			row += '<ul class="top">';
+			row += '<li></li>';
+			row += '<li></li>';
+			row += '<li></li>';
+			row += '<li>Итого:</li>';
+			row += '<li>'+sf.getTriad((this.value.sum || ''))+'</li>';
+
+			row += '<li></li>';
+			row += '<li></li>';
+			row += '<li></li>';
+			row += '<li></li>';
+			row += '</ul>';
+
+			this.elem.innerHTML = row;
+		}
+	});
+
+content.setThen(() => total.update());
+</script>
+
+
+
+
+
+<script>//прокрутка и прелоадер
+let preload = new El('<p>please wait...</p>', content)
+	.setParentNode(content.elem)
+	.setHandler(function(){
+		this.elem.remove();
+
+		if( this.model.getVal().main_data && this.model.getVal().main_data.length ) this.answer_backend = false;
+	})
+	.render();
+
+window.addEventListener('scroll', function(){
+	if(document.documentElement.getBoundingClientRect().bottom - document.documentElement.clientHeight < 150)
+	{
+		if(!preload.answer_backend)
+		{
+			preload.answer_backend = true;
+			preload.render();
+			frontend_data.tmpl_data.event = 'load';
+			frontend_data.tmpl_data.start += frontend_data.tmpl_data.limit;
+			content.query();
+		}
+	}
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="footer">
+	<span id="foot_select_all">Выделить все</span> /
+	<span id="foot_remove_selection">Снять выделение</span> /
+	<span id="foot_expand">Развернуть</span> /
+	<span id="foot_turn">Свернуть</span> /
+	<span id="foot_stay_on">Оставить выделенное</span>
+	<br><br><br>
+	<span id="foot_change_status">Изменить статус</span>
+	<br><br><br>
+	<?if(ACCESS_TO_ACTION):?>
+	<span id="foot_delete_selection">Удалить</span>
+	<?endif?>
+</div>
+<script>//анимация footer блока
+function footerToggle()
+{
+	footer.style.bottom = (!document.body.querySelector('.opt input:checked')) ? -footer.scrollHeight+'px' : '0px';
+}
+
+content.setThen(footerToggle); //footerToggle будет выполнена после оповещения всех подписчиков
+
+main.addEventListener('click', function(){ //клик по опциональному чекбоксу
+	if(event.target.closest('.opt input')) footerToggle();
+});
+</script>
+
+<script> //обработчики событий footer блока
+//выделить всё
+footer.querySelector('#foot_select_all').addEventListener('click', function(){
+	let checkbox_not_checked = document.body.querySelectorAll('.opt input:not(:checked)');
+
+	for(let i = 0; i < checkbox_not_checked.length; i++)
+	{
+		checkbox_not_checked[i].checked = true;
+		checkbox_not_checked[i].parentElement.parentElement.parentElement.style.opacity = 1;
+	}
+});
+
+//снять выделение
+footer.querySelector('#foot_remove_selection').addEventListener('click', function(){
+	let rows = document.body.querySelectorAll('.row:not(#header)');
+
+	for(let i = 0; i < rows.length; i++)
+	{
+		//проверка нужна если есть строка total в шаблоне
+		if(rows[i].querySelector('.opt input')) rows[i].querySelector('.opt input').checked = false;
+		rows[i].style.opacity = 1;
+	}
+	
+	footerToggle();
+});
+
+//развернуть
+footer.querySelector('#foot_expand').addEventListener('click', function(){
+	let checkbox_checked = document.body.querySelectorAll('.opt input:checked');
+
+	for(let i = 0; i < checkbox_checked.length; i++)
+	{
+		let sub = checkbox_checked[i].parentElement.parentElement.parentElement.querySelector('.sub');
+		sub.style.height = sub.scrollHeight+'px';
+		checkbox_checked[i].parentElement.parentElement.querySelector('.opt img').src = '<?=BASE?>/img/double-up.png';
+	}
+});
+
+//свернуть
+footer.querySelector('#foot_turn').addEventListener('click', function(){
+	let checkbox_checked = document.body.querySelectorAll('.opt input:checked');
+
+	for(let i = 0; i < checkbox_checked.length; i++)
+	{
+		let sub = checkbox_checked[i].parentElement.parentElement.parentElement.querySelector('.sub');
+		sub.style.height = sub.scrollHeight+'px';
+		window.getComputedStyle(sub, null).height;
+		sub.style.height = '0px';
+		checkbox_checked[i].parentElement.parentElement.querySelector('.opt img').src = '<?=BASE?>/img/double-down.png';
+	}
+});
+
+//оставить выделенное
+footer.querySelector('#foot_stay_on').addEventListener('click', function(){
+	let checkbox_not_checked = document.body.querySelectorAll('.opt input:not(:checked)');
+
+	//для обновления представления формируется псевдо-ответ сервера
+	let pseudo_answer = {
+		main_data: [],
+		meta_data: {event: 'del'}
+	};
+
+	//ninja code
+	//здесь записывается в псевдо-массив ответа сервера id записей, соответствующие id из БД
+	for(let i = 0; i < checkbox_not_checked.length; i++)
+		pseudo_answer.main_data.push({id: content.observers[ checkbox_not_checked[i].parentElement.parentElement.parentElement.getAttribute('id') ].value.id});
+
+	content.setVal(pseudo_answer); //обновление представления
+});
+
+//изменить статус
+footer.querySelector('#foot_change_status').addEventListener('click', function(){
+	let checkbox_checked = document.body.querySelectorAll('.opt input:checked');
+
+	let change_status_data = {
+		id: [],
+		rows: [] //это свойство необходимо для контроля статусов методом checkStatusChanges
+	};
+
+
+	for(let i = 0; i < checkbox_checked.length; i++)
+	{
+		if(checkbox_checked[i].parentElement.parentElement.parentElement.nodeName === 'FORM') continue; //если чекбокс на форме редактирования не брать его
+
+		change_status_data.id.push( content.observers[ checkbox_checked[i].parentElement.parentElement.parentElement.getAttribute('id') ].value.id );
+		change_status_data.rows.push( content.observers[ checkbox_checked[i].parentElement.parentElement.parentElement.getAttribute('id') ] );
+	}
+	
+	change_status_form
+			.setVal({'event':'reset'})
+			.setVal(change_status_data) //id редактируемых строк
+			.render();
+
+	background_layer.render();
+});
+
+<?if(ACCESS_TO_ACTION):?>
+//удаление записей
+footer.querySelector('#foot_delete_selection').addEventListener('click', function(){
+	
+	if( !confirm('Вы действительно хотите удалить записи?') ) return;
+	
+	
+	let checkbox_checked = document.body.querySelectorAll('.opt input:checked');
+	
+	let rows_id = [];
+	for(let i = 0; i < checkbox_checked.length; i++)
+	{
+		if(checkbox_checked[i].parentElement.parentElement.parentElement.nodeName === 'FORM') continue; //если чекбокс на форме редактирования не брать его
+
+		rows_id.push( content.observers[ checkbox_checked[i].parentElement.parentElement.parentElement.getAttribute('id') ].value.id );
+	}
+
+	frontend_data.form_edit = {id:JSON.stringify(rows_id)};
+
+	frontend_data.tmpl_data.event = 'del';
+	
+	content.query();
+	
+	edit_form.setVal({'event':'reset'});
+});
+<?endif?>
+</script>
+
+
+
+
+</body>
+</html>

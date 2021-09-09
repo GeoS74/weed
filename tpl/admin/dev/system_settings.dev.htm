@@ -1,0 +1,64 @@
+<!DOCTYPE HTML> 
+<html lang="ru">
+<head>
+  <title><?=PAGE_TITLE?></title>
+  <? include_once ROOT_PATH.'/tpl/common/header.htm'; ?>
+<style>
+#setting_list{margin:20px;}
+#setting_list li{padding:10px 0;}
+#setting_list label{margin-left:15px;}
+</style>
+<script type="text/javascript" src="<?=BASE?>/lib/dev/Elementary.js"></script>
+</head>
+<body>
+<?include_once ROOT_PATH.'/tpl/common/hellouser.htm';?>
+
+<?include_once ROOT_PATH.'/tpl/common/menu.htm';?>
+
+<h1><?=PAGE_TITLE?></h1>
+
+<script>
+let frontend_data = {
+		tmpl_data: {
+			module: '<?=MODULE?>',
+			template: '<?=TMPL_NAME?>',
+			event: 'load',
+		},
+		form_edit: {},
+	};
+
+
+let edit_form = new El('<form>')
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.setData(frontend_data)
+	.on('submit', function(){event.preventDefault()})
+	.render()
+	.render('beforeend', '<ul id="setting_list"></ul>')
+	.query()
+	.setHandler(function(){
+		if(frontend_data.tmpl_data.event === "change") alert("Настройки успешно изменены");
+	})
+	;
+
+//checkbox
+new El('<input type="checkbox" name="registrate_mode" id="ch_1"/>', edit_form)
+	.setParentNode(setting_list)
+	.render().wrap('<li>')
+	.render(null, '<label for="ch_1">Пользователи могут регистрироваться</label>')
+	.setHandler(function(){
+		if(this.model.getVal()['registration_mode']) this.elem.checked = true;
+	});
+
+//submit
+new El('<input type="submit" value="Сохранить"/>')
+	.setParentNode(setting_list)
+	.render().wrap('<li>')
+	.on('click', function(){
+		frontend_data.form_edit = new FormData(edit_form.elem);
+		frontend_data.tmpl_data.event = 'change';
+		edit_form.query();
+	});
+</script>
+
+</body>
+</html>

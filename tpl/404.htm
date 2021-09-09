@@ -1,0 +1,17 @@
+<!--приветствие пользователя-->
+<? include_once ROOT_PATH.'/tpl/common/hellouser.htm'; ?>
+
+
+<?
+if( $user -> get('rank') == 'admin' ) printf("<pre>\n<a href='%s/admin'>Панель администратора</a>\n", BASE);
+
+printf("<h1>404 not found</h1>\n");
+//dump($_SESSION);
+//dump($user -> getProperties());
+//echo date("Y-m-d H:i:s", $user -> get('date_create')/1000);
+//dump($_SERVER);
+//dump($_COOKIE);
+//dump($_COOKIE[session_name()]);
+//dump(session_id());
+//dump(session_name());
+?>

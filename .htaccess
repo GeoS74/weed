@@ -1,0 +1,31 @@
+#указывает браузеру в какой кодировке отображать документ
+AddDefaultCharset utf-8
+
+Options All -Indexes
+<FilesMatch ".(htaccess|ini|inc|tpl|htm)$">
+ #Order Allow,Deny
+ #Deny from all
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+Options +FollowSymlinks
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [L,QSA]
+</IfModule>
+
+php_flag register_globals off
+php_flag short_open_tag on
+
+# Заголовок Cache-Control
+<IfModule mod_headers.c>
+        Header append Cache-Control "no-store, no-cache, must-revalidate"
+</IfModule>
+ 
+# Заголовок Expires
+<IfModule mod_expires.c>
+        ExpiresActive On ExpiresDefault "now"
+</IfModule>

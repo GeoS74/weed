@@ -1,0 +1,368 @@
+<!DOCTYPE HTML> 
+<html lang="ru">
+<head>
+  <title><?=PAGE_TITLE?></title>
+  <? include_once ROOT_PATH.'/tpl/common/header.htm'; ?>
+<style>
+form{
+	position: relative;
+	width: 400px;
+	margin: 0 auto;
+    padding: 0 0 15px 0;
+	box-shadow: 1px 1px 0px 0.5px #336699;
+	border: 0px solid #EEEEEE;
+	border-radius: 15px;
+}
+
+h1{
+	margin: 0px;
+	padding: 10px;
+	color: #3F51B5; /*хороший вариант #336699*/
+	font-size: 2.4em;
+	text-align: center;
+	cursor: default;
+}
+
+input, span{margin: 5px 20px;}
+
+input[type=text],
+input[type=password],
+input[type=email]{
+	width: 75%;
+	padding: 10px 20px;
+}
+input[type=submit]{
+	padding:5px 25px;
+	background-color:#3F51B5;
+	border:0px;
+	border-radius:5px;
+	color:white; 
+	cursor:pointer;
+	font-size: 0.9em;
+}
+input[type=submit]:hover{background-color:#283593;}
+
+#mode{
+	float:right;
+	font-size:0.9em;
+}
+#mode:hover{
+	cursor:pointer;
+	text-decoration:underline;
+	color:#3F51B5;
+}
+.message{display: inline-block; margin: 5px 20px;}
+</style>
+<script type="text/javascript" src="<?=BASE?>/lib/dev/Elementary.js"></script>
+</head>
+<body>
+<script>
+let frontend_data = {
+	tmpl_data: {
+		module: '<?=MODULE?>',
+		template:   '<?=TEMPLATE?>',
+		event: 'login',
+	},
+	form_data: {}
+};
+
+let form = new El('<form method="post">')
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.setData(frontend_data)
+	.on('submit', function(){event.preventDefault()})
+	.setHandler(function(){
+		//if(this.getVal().event == 'reset') this.elem.reset();
+
+		if(this.getVal().login === true || this.getVal().register === true) window.location.href = '<?=BASE?>/login';
+	})
+	.render('beforeend', '<h1>Форма входа</h1>')
+	.render();
+
+new El('<span class="message"></span>', form)
+	.setHandler(function(){
+		if(this.model.getVal().errors && this.model.getVal().errors.length)
+		{
+			this.setParentNode(form.elem.querySelector('h1')).render('afterend');
+			this.elem.style.color = 'red';
+			this.elem.innerHTML = this.model.getVal().errors;
+		}
+		else if(this.model.getVal().login === true || this.model.getVal().register === true)
+		{
+			this.setParentNode(form.elem.querySelector('h1')).render('afterend');
+			this.elem.style.color = '#3F51B5';
+			this.elem.innerHTML = 'Вы успешно '+(this.model.getVal().login ? 'авторизировались.' : 'зарегестрировались.')+'<br><br>';
+			this.elem.innerHTML += 'Сейчас Вы будете перенаправлены на главную страницу. Если этого не произошло в течении 10 сек перейдите ';
+			this.elem.innerHTML += '<a href="<?=BASE?>/login">по ссылке</a>';
+		}
+	});
+
+new El('<input type="text" name="name" placeholder="login..." pattern="[a-zA-Z0-9-_+\s]{3,}" required autofocus/>', form)
+	.setParentNode(form.elem)
+	.render();
+
+
+new El('<input type="password" name="pass" placeholder="password..." pattern="[a-zA-Z0-9-_*?#~%]{3,}" required/>', form)
+	.setParentNode(form.elem)
+	.render();
+
+new El('<input type="email" name="email" placeholder="email..." pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}" required/>', form)
+	.setParentNode(form.elem)
+	.setHandler(function(){
+		switch(this.model.getVal().event)
+		{
+			case 'regMode':
+				this
+					.setParentNode(form.elem.querySelector('input[type=submit]'))
+					.render('beforebegin');
+				break;
+			case 'loginMode':
+				this.elem.remove();
+				break;
+		}
+	});
+
+new El('<input type="submit" value="Войти"/>')
+	.setParentNode(form.elem)
+	.render()
+	.on('click', function(){
+		frontend_data.form_data = new FormData(form.elem);
+
+		if(!checkData(frontend_data.form_data))
+		{
+			frontend_data.form_data = {};
+			return;
+		}
+		
+		frontend_data.tmpl_data.event = form.elem.querySelector('#mode') ? form.elem.querySelector('#mode').dataset.mode : 'login'; //если регистрация отключена
+		form.setVal({event:'reset'});
+		form.query();
+	});
+
+<?IF(REGISTRATE_MODE):?>
+new El('<span id="mode" data-mode="login">Регистрация</span>')
+	.setParentNode(form.elem)
+	.render()
+	.on('click', function(){
+		this.dataset.mode = this.dataset.mode == "register" ? "login" : "register";
+		
+		if(this.dataset.mode == "register")
+		{
+			this.innerText = "Авторизация";
+			form.setVal({event:'regMode'});
+		}
+		else
+		{
+			this.innerText = "Регистрация";
+			form.setVal({event:'loginMode'});
+		}
+	});
+<?ENDIF?>
+
+function checkData(form_data)
+{
+	let iterator = form_data.entries();
+	while(true)
+	{
+		let result = iterator.next();
+		if(result.done) break;
+
+		switch(result.value[0])
+		{
+			case 'name':
+				if(result.value[1].length < 3)
+				{
+					form.setVal({'errors': 'Слишком короткий логин'});
+					return false;
+				}
+
+				if(new RegExp('[^a-zA-Z0-9-_+\s]', 'g').test(result.value[1]))
+				{
+					form.setVal({'errors': 'Логин указан не корректно'});
+					return false;
+				}
+				break;
+
+			case 'pass':
+				if(result.value[1].length < 3)
+				{
+					form.setVal({'errors': 'Слишком короткий пароль'});
+					return false;
+				}
+
+				if(new RegExp('[^a-zA-Z0-9-_*?#~%]', 'g').test(result.value[1]))
+				{
+					form.setVal({'errors': 'Пароль указан не корректно'});
+					return false;
+				}
+				break;
+			
+			case 'email':
+				if(result.value[1].length < 5)
+				{
+					form.setVal({'errors': 'Слишком короткий e-mail'});
+					return false;
+				}
+
+				if(!new RegExp('[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}', 'g').test(result.value[1])) //обратный слеш надо удваивать!!!
+				{
+					form.setVal({'errors': 'e-mail указан не корректно'});
+					return false;
+				}
+				break;
+		}
+	}
+	return true;
+}
+
+
+//set position form
+function setTopPositionForm(){form.elem.style.top = (document.documentElement.clientHeight/2 - form.elem.offsetHeight/2) + 'px';}
+setTopPositionForm();
+window.addEventListener('resize', setTopPositionForm);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?exit?>
+
+
+
+
+
+
+
+<div id="content">
+<form enctype="multipart/form-data" method="post" id="login_form">
+  <h1>Форма входа</h1>
+      <input type="text"     name="login" pattern="[a-zA-Zа-яА-Я0-9_+-\s]{3,}" required placeholder="логин" autofocus />
+      <input type="password" name="pass"  pattern="[a-zA-Z0-9_-%*?%#~]{3,}"          required placeholder="пароль"/>
+
+	  <?
+	  $reg_true=false; //эта переменная влияет на формирование кода JS
+	  if($reg_true):?>
+			  <input type="email"    name="mail"  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}" placeholder="email"/>
+			  <input type="text"     name="company"  pattern="[a-zA-Z0-9_-]{3,}" placeholder="компания" />
+	  <?endif?>
+	  <input type="submit" value="Войти" class="button_edit_data"/>
+	  <div id="mode_form">
+	    <span>Форма входа</span>
+		<?if($reg_true):?>
+			<span>Регистрация</span>
+		<?endif?>
+	  </div>
+</form>
+</div>
+<?exit?>
+<script type="text/javascript" src="<?=$url -> root?>/js/class/Form.js"></script>
+<script type="text/javascript" src="<?=$url -> root?>/js/class/SystemFunctions.js"></script>
+<script type="text/javascript" src="<?=$url -> root?>/js/class/Graf.js"></script>
+<script type="text/javascript" src="<?=$url -> root?>/js/class/Easy_rows.js"></script>
+<script>
+"use strict"
+$( document ).ready(function() {
+  var sf = new SystemFunctions,
+      backend = new Backend,
+      login_form = new Form( '#login_form' ),
+	  views = new Observer( backend ),
+	  tmpl_data = {
+        module: '<?=MODULE?>',
+	    name:   '<?=TMPL_NAME?>',
+	    event: 'login',
+	  };
+  login_form.background_mode();
+backend
+  .setPath( '<?=BACKEND_CONTROLLER?>' )
+  .setData({
+    login_data: login_form.data,
+    tmpl_data: tmpl_data,
+  });
+  Observer.prototype.update = function() {
+    var val = this.model.getVal();
+	login_form.hideMessage();
+	if( val.errors ) {
+	  login_form.showMessage( val.errors );
+	  return;
+	}
+	<?if($reg_true):?>
+	if( tmpl_data.event == 'registration' ) window.location.href = '<?=$url -> root?>/login';
+	<?endif?>
+	if( val.login ) window.location.href = '<?=$url -> root?>';
+  };
+  Form.prototype.showMessage = function( message ) {
+    message = '<p>' + message + '</p>';
+    this.$().find( 'h1' ).after( message );
+	return this;
+  };
+  Form.prototype.hideMessage = function( message ) {
+    this.$().find( 'h1 + p' ).remove();
+	return this;
+  };
+  Form.prototype.show = function() {
+    this.$().css({
+	  'display':'block',
+	  'top': $(document).height()/2-100 + 'px',
+	});
+	<?if($reg_true):?>
+	this.$()
+	  .find( 'input[name="mail"]' ).css('display', 'none') //скрыть поле для email
+	  .end()
+	  .find( 'input[name="company"]' ).css('display', 'none'); //скрыть поле для компании
+	<?endif?>
+    this.$().find( 'span' ).eq(0).css('display', 'none');
+    return this;
+  };
+  login_form.show();
+<?if($reg_true):?>
+login_form.$().on('click', 'span', function() {
+  switch( $(this).index() ){
+    case 1:                  //показать поля для регистрации
+      tmpl_data.event = 'registration';
+
+	  login_form.hideMessage().reset();
+
+      login_form.$()
+	    .find( 'input' ).eq(2).css('display', 'inline')
+        .end().end()
+		.find( 'input' ).eq(3).css('display', 'inline').attr('required', 'required')
+        .end().end()
+	    .find( 'span' ).eq(0).css('display', 'inline')
+	    .end()
+	    .eq(1).css('display', 'none');
+	  break;
+
+	case 0:                  //показать поля для авторизации
+      tmpl_data.event = 'login';
+
+      login_form.$()
+	    .find( 'input' ).eq(2).css('display', 'none')
+		.end().end()
+		.find( 'input' ).eq(3).css('display', 'none').attr('required', false)
+		.end().end()
+	    .find( 'span' ).eq(0).css('display', 'none')
+		.end()
+	    .eq(1).css('display', 'inline');
+	  break;
+  }
+
+});
+<?endif?>
+login_form.$().submit( function() {backend.query();});
+});
+</script>
+</body>
+</html>

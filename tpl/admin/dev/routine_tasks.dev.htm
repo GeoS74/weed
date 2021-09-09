@@ -1,0 +1,177 @@
+<!DOCTYPE HTML> 
+<html lang="ru">
+<head>
+  <title><?=PAGE_TITLE?></title>
+  <? include_once ROOT_PATH.'/tpl/common/header.htm'; ?>
+<style>
+#routine_tasks_list{margin:20px 40px;}
+#routine_tasks_list li{padding:10px 0;list-style-type:decimal;}
+#routine_tasks_list span{
+	display:inline-block;
+	width:250px;
+	margin-right:15px;
+}
+</style>
+<script type="text/javascript" src="<?=BASE?>/lib/dev/Elementary.js"></script>
+</head>
+<body>
+<?include_once ROOT_PATH.'/tpl/common/hellouser.htm';?>
+
+<?include_once ROOT_PATH.'/tpl/common/menu.htm';?>
+
+<h1><?=PAGE_TITLE?></h1>
+<script>
+let frontend_data = {
+		tmpl_data: {
+			module: '<?=MODULE?>',
+			template: '<?=TMPL_NAME?>',
+		},
+		event: 'run'
+	};
+
+
+let edit_form = new El('<form>')
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.setData(frontend_data)
+	.on('submit', function(){event.preventDefault()})
+	.render()
+	.render('beforeend', '<ol id="routine_tasks_list">')
+	.setHandler(function(){
+	})
+	;
+
+
+
+
+
+
+
+
+//Чтение извещений из ЕИС 44-ФЗ
+let read_eis_button_44 = new El('<input type="submit" value="Запустить"/>')
+	.setParentNode(routine_tasks_list)
+	.render()
+	.wrap('<li>')
+	.render('beforebegin', '<span>Чтение извещений из ЕИС 44-ФЗ</span>')
+	.on('click', function(){
+		frontend_data.name_task = 'read_eis_44';
+
+
+		this.disabled = true;
+
+		edit_form.query();
+		
+		//опрос сервера о прогрессе загрузки
+		let progress = new El()
+			.setPath('<?=BACKEND_CONTROLLER?>')
+			.setData({
+					tmpl_data: {
+						module: '<?=MODULE?>',
+						template: '<?=TMPL_NAME?>',
+					},
+					name_task: 'read_eis_44',
+				})
+			.setHandler(function(){
+				console.log(this.getVal());
+
+				if(this.getVal() !== null)
+				{
+					//отрисовка прогресса
+					this.query();
+				}
+				else
+				{
+					read_eis_button_44.elem.disabled = false;
+				}
+			}).query();
+	});
+
+
+
+
+
+//Чтение извещений из ЕИС 223-ФЗ
+let read_eis_button_223 = new El('<input type="submit" value="Запустить"/>')
+	.setParentNode(routine_tasks_list)
+	.render()
+	.wrap('<li>')
+	.render('beforebegin', '<span>Чтение извещений из ЕИС 223-ФЗ</span>')
+	.on('click', function(){
+		frontend_data.name_task = 'read_eis_223';
+
+		this.disabled = true;
+
+		edit_form.query();
+
+		//опрос сервера о прогрессе загрузки
+		let progress = new El()
+			.setPath('<?=BACKEND_CONTROLLER?>')
+			.setData({
+					tmpl_data: {
+						module: '<?=MODULE?>',
+						template: '<?=TMPL_NAME?>',
+					},
+					name_task: 'read_eis_223',
+				})
+			.setHandler(function(){
+				console.log(this.getVal());
+
+				if(this.getVal() !== null)
+				{
+					//отрисовка прогресса
+					this.query();
+				}
+				else
+				{
+					read_eis_button_223.elem.disabled = false;
+				}
+			}).query();
+	});
+	
+	
+	
+
+
+
+
+
+//Чтение справочника ОКПД2
+let read_eis_button_okpd2 = new El('<input type="submit" value="Запустить"/>')
+	.setParentNode(routine_tasks_list)
+	.render()
+	.wrap('<li>')
+	.render('beforebegin', '<span>Чтение справочника ОКПД2</span>')
+	.on('click', function(){
+		frontend_data.name_task = 'read_okpd2';
+		
+		this.disabled = true;
+		
+		edit_form.query();
+		
+		//опрос сервера о прогрессе загрузки
+		let progress = new El()
+			.setPath('<?=BACKEND_CONTROLLER?>')
+			.setData({
+					tmpl_data: {
+						module: '<?=MODULE?>',
+						template: '<?=TMPL_NAME?>',
+					},
+					name_task: 'read_okpd2',
+				})
+			.setHandler(function(){
+				console.log(this.getVal());
+
+				if(this.getVal() !== null)
+				{
+					//отрисовка прогресса
+					this.query();
+				}
+				else
+				{
+					read_eis_button_okpd2.elem.disabled = false;
+				}
+			}).query();
+	});
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE HTML> 
+<html lang="ru">
+<head>
+  <title><?=PAGE_TITLE?></title>
+  <? include_once ROOT_PATH.'/tpl/common/header.htm'; ?>
+<style>
+#sections li{margin:20px; font-size:0.9em;}
+</style>
+</head>
+<body>
+<?include_once ROOT_PATH.'/tpl/common/hellouser.htm';?>
+
+<?include_once ROOT_PATH.'/tpl/common/menu.htm';?>
+
+<h1><?=PAGE_TITLE?></h1>
+
+<ul id="sections">
+<li><a href="<?=BASE?>/admin/system/settings">Системные настройки</a></li>
+<li><a href="<?=BASE?>/admin/users">Пользователи системы</a></li>
+<li><a href="<?=BASE?>/admin/users/rank">Ранги пользователей</a></li>
+<li><a href="<?=BASE?>/admin/users/company">Компании</a></li>
+<li style="padding-bottom:15px"></li>
+<li><a href="<?=BASE?>/admin/menu/crm">Редактор меню CRM-системы</a></li>
+<li><a href="<?=BASE?>/admin/menu/main">Редактор меню админ панели</a></li>
+</ul>
+</body>
+</html>

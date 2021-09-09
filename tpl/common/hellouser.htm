@@ -1,0 +1,14 @@
+<div id="user">
+<?if($user -> get('name')):?>
+Пользователь: 
+<?
+	if( $user -> get('rank') == 'admin' )
+		printf("<a href='%s/admin'>%s</a>", BASE, $user -> get('name'));
+	else
+		printf("%s", $user -> get('name'));
+?>
+  / <a href="<?=BASE?>/logout">выход</a>
+<?else:?>
+<a href="<?=BASE?>/login">войти</a>
+<?endif?>
+ </div>

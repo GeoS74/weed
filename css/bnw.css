@@ -1,0 +1,74 @@
+/*bnw style*/
+
+body{font-size:14px; font-family:'Arimo'; color:#424242; width:100%; height:100%;}
+
+h1{font-size:2em; margin:35px 20px; cursor:default;}
+h2{font-size:1.8em; margin:35px 20px; cursor:default;}
+
+p{font-size:0.9em; margin:15px 20px;}
+
+a{color:#424242; text-decoration:underline;}
+a:hover{color:#3F51B5; text-decoration:none;}
+
+label:hover{color:#3F51B5;}
+
+
+input[type=checkbox],
+input[type=submit],
+a,
+label{cursor:pointer;}
+
+
+h1::selection,
+h2::selection,
+h3::selection,
+p::selection,
+a::selection,
+i::selection,
+b::selection,
+td::selection,
+ul::selection,
+li::selection,
+input::selection,
+label::selection,
+form::selection,
+img::selection,
+span::selection,
+textarea::selection{background:#757575; color:#F5F5F5}
+
+
+
+/*styles for hellouser.htm*/
+#user{position: absolute; top: 20px; right: 20px; color: #F5F5F5; z-index: 100501;}
+#user a{color:#F5F5F5;}
+#user a:hover{text-decoration: none;}
+
+/*styles for form inputs*/
+input{padding:5px 10px;}
+
+
+/*styles for form buttons*/
+select,
+.submit_cancel,
+.submit_delete,
+.submit_ok{
+	padding: 6px 15px;
+	cursor:pointer;
+}
+
+.submit_cancel,
+.submit_delete,
+.submit_ok{font-size:0.9em;}
+
+.submit_ok{
+	background-color:#3F51B5;
+	border:0px;
+	border-radius:5px;
+	color:white; 
+}
+
+.submit_cancel,
+.submit_delete{color:#424242;}
+.submit_ok:hover{background-color:#283593;}
+.submit_cancel:hover{color:#3F51B5;}
+.submit_delete:hover{color:red;}

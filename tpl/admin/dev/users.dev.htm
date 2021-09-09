@@ -1,0 +1,1047 @@
+<!DOCTYPE HTML> 
+<html lang="ru">
+<head>
+  <title><?=PAGE_TITLE?></title>
+  <? include_once ROOT_PATH.'/tpl/common/header.htm'; ?>
+<style>
+/*обрати внимание на эти стили!!!
+
+
+#content{margin: 20px;}
+#content li{margin: 10px;}
+input[type=text],
+select,
+label{margin-right:8px;}
+*/
+
+
+
+
+
+
+
+
+
+
+
+form{margin:0px;}
+
+
+
+/*~~~~~~~~~~~~~~~~~~search form img style~~~~~~~~~~~~~~~~~~*/
+#search_form{margin:20px;}
+
+#search_img{width:15px; cursor:pointer; margin:0 15px 0 10px;}
+#excel_img{float:left; margin:35px;}
+
+#search_form input[type=checkbox]{margin: 0 10px;}
+#search_form label{margin-right: 25px;}
+
+
+
+
+
+
+
+/*~~~~~~~~~~~~~~~~~~add submit style~~~~~~~~~~~~~~~~~~*/
+#add_submit{
+	width:155px;
+	cursor:pointer;
+	text-decoration:underline;
+	font-size:0.9em;
+}
+#add_submit:hover{text-decoration:none;}
+
+
+
+
+
+
+
+/*~~~~~~~~~~~~~~~~~~style~~~~~~~~~~~~~~~~~~*/
+#main{
+	display:inline-block; /*для автоподгона ширины блока по содержимому*/
+	margin:20px;
+	padding-bottom:180px;
+}
+
+.row{
+	clear:both;
+	border:1px solid #BDBDBD;
+	border-bottom:0px;
+	overflow:hidden; /*заставляет div установить свою высоту по содержимому*/
+}
+.row:last-child{border-bottom:1px solid #BDBDBD;}
+.row:nth-child(2n+1){background:#F5F5F5;}
+
+
+.row ul{position:relative; float:left;}
+.row ul:not(.sub) > li{float:left;}
+
+.row ul:not(.opt) li{padding:15px; font-size:0.9em;}
+.row .opt li{padding:15px 10px; width:20px;}
+
+
+
+.opt img,
+.opt input,
+.act input{cursor:pointer;}
+
+
+.sub,
+.act{
+	clear:both;
+	overflow:hidden;
+}
+
+
+.act > input{margin:0px 15px 15px 15px;}
+
+
+
+/*~~~~~~~~~~~~~~~~~~styles for animation sub block~~~~~~~~~~~~~~~~~~*/
+.sub{
+	height:0px;
+	-webkit-transition: height .2s linear;
+	-moz-transition: height .2s linear;
+	-o-transition: height .2s linear;
+	transition: height .2s linear;
+}
+
+
+
+
+
+
+
+/*~~~~~~~~~~~~~~~~~~footer style~~~~~~~~~~~~~~~~~~*/
+#footer{
+	position:fixed;
+	background:#757575;
+	color: #F5F5F5;
+	width: 100%;
+	z-index: 100500;
+	padding: 20px;
+	
+	/*styles for animation footer*/
+	height: 135px;
+	bottom:-135px;
+	-webkit-transition: bottom .2s linear;
+	-moz-transition: bottom .2s linear;
+	-o-transition: bottom .2s linear;
+	transition: bottom .2s linear;
+}
+
+#footer span{margin:10px; opacity:0.85; cursor:pointer;}
+#footer span:hover{text-decoration:underline; opacity: 1;}
+
+
+
+
+
+/*~~~~~~~~~~~~~~~~~~special styles~~~~~~~~~~~~~~~~~~*/
+#header{background: #757575; color: #F5F5F5; cursor:default;}
+
+
+#header .top,
+.sub,
+.act{left:80px;}
+
+
+
+#search_form input[type=search]{width:350px;}
+
+
+
+.top > li:nth-child(1){width:110px;}
+.top > li:nth-child(2),
+.top > li:nth-child(3){width:210px;}
+.top > li:nth-child(4){width:190px;}
+.top > li:nth-child(5){width:100px;}
+.top > li:nth-child(6){width:50px;}
+.top > li:nth-child(7){width:80px;}
+
+
+input[name=name]{width:100px;}
+input[name=full_name],
+input[name=email]{width:200px;}
+input[name=weight]{width:40px;}
+input[name=ip]{width:60px;}
+
+
+
+.top > li{border: 0px solid red;}
+.top, .sub, .act{border: 0px solid red;}
+
+</style>
+<script type="text/javascript" src="<?=BASE?>/lib/dev/Elementary.js"></script>
+<script type="text/javascript" src="<?=BASE?>/js/class/Graf.js"></script>
+</head>
+<body>
+<?include_once ROOT_PATH.'/tpl/common/hellouser.htm';?>
+
+<?include_once ROOT_PATH.'/tpl/common/menu.htm';?>
+
+<h1><?=PAGE_TITLE?></h1>
+
+
+
+<!--BUG`s DETECTED
+1) добавить в footer удаление записей
+
+
+2) при загрузке страницы видно как footer плавно уезжает вниз
+
+
+
+3) объект preload не является полностью автономным. метод content.clear() использует вызов preload.render()
+
+Решено:
+
+- content.clear применяется 2 раза (до запроса поиска и после ответа сервера)
+-->
+
+<script>//frontend data for request
+let frontend_data = {
+		tmpl_data: {
+			module: '<?=MODULE?>',
+			template: '<?=TMPL_NAME?>',
+			start: 0,
+			limit: 30,
+			event: 'load',
+		},
+		form_edit: {},
+		form_search: {},
+	};
+</script>
+
+
+
+
+
+<script>//форма поиска
+let search_form = new El('<form id="search_form" method="post">')
+	.render()
+	.on('submit', function(){event.preventDefault()})
+	.on('input', function(){
+		frontend_data.form_search[event.target.name] = (event.target.type == 'checkbox') ? event.target.checked : event.target.value;
+	});
+
+search_form.filterKey = function(keyCode)
+{
+	switch(keyCode)
+	{
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+		case 20:
+		case 27:
+		case 33:
+		case 34:
+		case 35:
+		case 36:
+		case 37:
+		case 38:
+		case 39:
+		case 40:
+		case 44:
+		case 91:
+		case 92:
+		case 93:
+		case 116:
+		case 144:
+		case 145:
+		case 192:
+			return false;
+			break;
+		default: return true;
+	}
+};
+
+search_form.query = function()
+{
+	frontend_data.tmpl_data.start = 0;
+	frontend_data.tmpl_data.event = 'load';
+	content.clear().query();
+};
+
+//search text
+new El('<input type="search" name="text_search" placeholder="поиск..."/>')
+	.setParentNode(search_form.elem)
+	.render()
+	.on('keyup', function(){
+		if(!search_form.filterKey(event.keyCode)) return;
+		search_form.query();
+	})
+	.render(null, '<img src="<?=BASE?>/img/search.png" id="search_img" onclick="this.previousElementSibling.focus()"/>');
+
+//checkbox
+new El('<input type="checkbox" name="search_for_name" id="ch_1"/>')
+	.setParentNode(search_form.elem)
+	.render()
+	.on('change', function(){
+		search_form.query();
+	})
+	.render(null, '<label for="ch_1">по имени</label>');
+
+//checkbox
+new El('<input type="checkbox" name="search_for_email" id="ch_2"/>')
+	.setParentNode(search_form.elem)
+	.render()
+	.on('change', function(){
+		search_form.query();
+	})
+	.render(null, '<label for="ch_2">по e-mail</label>');
+
+
+//select
+new El('<select name="search_for_company">')
+	.setParentNode(search_form.elem)
+	.render()
+	.render('beforeend', '<option value="">Выбрать компанию</option>')
+	.setData({tmpl_data: {module: '<?=MODULE?>', template: 'users_company'}})
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.query()
+	.setHandler(function(){
+		new Graf(this.model.getVal())
+			.sortBy('pos')
+			.each(function(){
+				search_form.elem.querySelector('select[name="search_for_company"]').insertAdjacentHTML('beforeend', '<option value="'+this.title+'">'+this.title+'</option>');
+			});
+	})
+	.on('change', function(){
+		search_form.query();
+	});
+</script>
+
+
+
+
+
+
+
+<script>//кнопка "Добавить пользователя"
+new El('<p id="add_submit">+ добавить пользователя</p>')
+	.render()
+	.on('click', function(){
+		edit_form
+			.setVal({'event':'reset'})
+			.setParentNode(content.elem)
+			.render('afterbegin');
+
+		frontend_data.tmpl_data.event = 'add';
+
+		edit_form.elem.querySelectorAll('.submit_cancel')[1].hidden = true; //кнопка смены пароля
+
+		edit_form.elem.querySelector('.submit_delete').hidden = true;
+		
+		edit_form.elem.querySelector('.opt input').hidden = true;
+
+		edit_form.elem.querySelector('input[name="name"]').focus();
+
+		checkState(null, edit_form.elem);
+	});
+</script>
+
+
+
+<div id="main">
+	<div id="header" class="row">
+		<ul class="top">
+			<li>Логин</li>
+			<li>Ф.И.О.</li>
+			<li>e-mail</li>
+			<li>Компания</li>
+			<li>Ранг</li>
+			<li>Вес</li>
+			<li>ip</li>
+		</ul>
+	</div>
+</div>
+
+
+
+
+<script>//main container
+let content = new El('<div id="content">')
+	.setParentNode(document.body.querySelector('#main'))
+	.render()
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.setData(frontend_data)
+	.query()
+	.on('dblclick', function(){
+		let div = event.target.closest('div.row');
+		if(!div) return;
+
+		let row = content.observers[ div.getAttribute('id') ];
+
+		frontend_data.tmpl_data.event = 'edit';
+
+		row.elem.hidden = true;
+
+		edit_form
+			.setVal({'event':'reset'})
+			.setVal({'event':'fill', 'value':row.value})
+			.setParentNode(row.elem)
+			.render('afterend');
+
+		edit_form.elem.querySelectorAll('.submit_cancel')[1].hidden = false; //кнопка смены пароля
+		edit_form.elem.querySelector('.submit_delete').hidden = false;
+		edit_form.elem.querySelector('.opt input').hidden = false;
+
+		checkState(row.elem, edit_form.elem); //перенос состояния sub блока и чекбокса
+	})
+	.setHandler(function(){
+		let val = this.model.getVal();
+
+		//console.log('answer:');
+		//console.log(val);
+
+		/*	скорее всего вызов content.clear() в этом месте не нужен,
+			т.к. content.clear() вызывается формой поиска и дублирование после ответа сервера это скорее всего параноя
+			на данный момент я не знаю ни одной ситуации, когда это нужно...
+			
+			if(val.meta_data.event == 'load' && !val.meta_data.start) content.clear();
+		*/
+
+
+		if(val.main_data[0] && val.main_data[0].errors) //контроль ошибок
+		{
+			alert(val.main_data[0].errors);
+			return;
+		}
+
+		if(val.meta_data.event == 'change_pass') //смена пароля
+		{
+			alert('Пароль успешно изменён');
+			return;
+		}
+
+
+		if(val.meta_data.event == 'load' || val.meta_data.event == 'add')
+			for(let key in val.main_data) constructRow.call(this, val.main_data[key]);
+
+
+		function constructRow(value_row)
+		{
+			if(!value_row) return;
+
+			//в качестве id для строки используется индекс позиции в массиве подписчиков this.observers
+			let row = new El('<div id="'+this.observers.length+'" class="row">', this);
+
+			row
+				.setParentNode(this.elem)
+				.setVal(value_row)
+				.setHandler(function(){
+
+					let val = this.model.getVal();
+
+					switch(val.meta_data.event)
+					{
+						case 'load':
+							if(!this.elem.children.length) htmlRow.call(this);
+							break;
+						case  'add':
+							if(!this.elem.children.length)
+							{
+								htmlRow.call(this);
+								checkState(edit_form.elem, this.elem); //контролировать состояние строк только при добавлении, но не при событии event
+							}
+							break;
+						case 'edit':
+							for(let i = 0; i < val.main_data.length; i++)
+							{
+								if(this.value.id == val.main_data[i].id)
+								{
+									/*	клон элемента нужен для переноса состояния чекбокса и sub блока,
+										т.к. вызов htmlRow.call(this) использует innerHTML, что обнулит состояние этих элементов
+									*/
+									let clone = row.elem.cloneNode(true);
+
+									updateValueRow.call(this, val.main_data[i]);
+									htmlRow.call(this);
+									
+									checkState(clone, row.elem); //перенос состояния sub блока и чекбокса
+									clone = null;
+									break;
+								}
+							}
+							break;
+						case 'del':
+							for(let i = 0; i < val.main_data.length; i++)
+							{
+								if(this.value.id == val.main_data[i].id)
+								{
+									this.model.detach(this);
+									this.elem.remove();
+									break;
+								}
+							}
+							break;
+					}
+				});
+
+			//при добавлении строка показывается сверху, при подгрузке в конце ленты
+			if(val.meta_data.event == 'add') row.render('afterbegin');
+			else row.render('beforeend');
+		}
+
+		function updateValueRow(new_value)
+		{
+			for(let key in new_value) if(key !== 'date_create') this.value[key] = new_value[key]; //Сервер вернёт новую дату создания, т.к. он возвращает записи не из БД, а из формы, поэтому дата создания обновится при использовании объекта BaseUnit - дату создания не обновлять
+		}
+
+		function htmlRow()
+		{
+			let row = "";
+			row += '<ul class="opt"><li><input type="checkbox"/></li><li><img src="<?=BASE?>/img/double-down.png"/></li></ul>';
+			
+			row += '<ul class="top">';
+			row += '<li>'+(this.getVal().name 	   || '')+'</li>';
+			row += '<li>'+(this.getVal().full_name || '')+'</li>';
+			row += '<li>'+(this.getVal().email     || '')+'</li>';
+			row += '<li>'+(this.getVal().company   || '')+'</li>';
+			row += '<li>'+(this.getVal().rank      || '')+'</li>';
+			row += '<li>'+(this.getVal().weight    || '')+'</li>';
+			row += '<li>'+(this.getVal().ip        || '')+'</li>';
+			row += '</ul>';
+
+
+			row += '<ul class="sub">';
+			row += '<li>Дата регистрации: '+ new Date(+this.getVal().date_create)+'</li>';
+			row += '</ul>';
+
+			this.elem.innerHTML = row;
+		}
+	});
+
+
+content.clear = function()
+{
+	this.elem.innerHTML = '';
+
+	/*удаление строк из списка подписчиков
+	//красивый вариант:
+	//	this.observers.splice( this.observers.length-this.elem.querySelectorAll('div.row').length );
+	//т.к. объекты-строки скорее всео попадают в список подписчиков последними, то можно обрезать массив подписчиков, предварительно вычислив индекс первого объекта-строки
+	//возможно это станет проблемой из-за состояния "гонки", т.к. если сервер ответит быстрее, чем все объекты подпишутся на обновления content,
+	//то возможно возникнет ситуация при которой список подписчиков станет таким: [content, row1, row2 ... rowN, anyObject ]
+	//тогда при обрезке массива this.observers, возможно будут удалены подписчики не являющиеся строками
+	//
+	//безпроблемный вариант удаления строк из списка подписчиков:*/
+	for(var i = 0, obs = []; i < this.observers.length; i++)
+	{
+		if(!this.observers[i]) continue; //массив подписчиков может содержать null
+		if(this.observers[i].elem && this.observers[i].elem.getAttribute('id') == i) continue; //здесь используется особенность формирования строк: id строки совпадает с индексом в массиве подписчиков 
+		obs.push(this.observers[i]);
+	}
+	this.observers = obs;
+	
+	preload.render();
+
+	return this;
+};
+</script>
+
+
+
+
+
+
+<script>//форма редактирования
+let edit_form = new El('<form class="row">')
+	.on('submit', function(){event.preventDefault()})
+	.setHandler(function(){
+		if(this.getVal().event == 'reset')
+		{
+			if( this.elem.previousElementSibling )
+			{
+				this.elem.previousElementSibling.hidden = false;
+
+				checkState(this.elem, this.elem.previousElementSibling); //перенос состояния sub блока и чекбокса
+			}
+
+			this.elem.reset();
+			this.elem.remove();
+		}
+	})
+	.render('beforeend', '<ul class="opt"><li><input type="checkbox"/></li><li><img src="<?=BASE?>/img/double-down.png"/></li></ul>')
+	.render('beforeend', '<ul class="top"></ul>')
+	.render('beforeend', '<ul class="sub"></ul>')
+	.render('beforeend', '<ul class="act"></ul>')
+	;
+
+
+//input type=text
+new El('<input type="text" name="name"/>', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			this.elem.value = this.model.getVal().value.name || '';
+		}
+	});
+
+new El('<input type="text" name="full_name"/>', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			this.elem.value = this.model.getVal().value.full_name || '';
+		}
+	});
+
+new El('<input type="text" name="email"/>', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			this.elem.value = this.model.getVal().value.email || '';
+		}
+	});
+
+//select
+new El('<select name="company">', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.render('beforeend', '<option value="Выбрать компанию">Выбрать компанию</option>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			if(this.model.getVal().value.company) this.elem.querySelector('option[value="'+this.model.getVal().value.company+'"]').selected = true;
+		}
+	});
+
+//выпадающий список компаний пользователей
+new El()
+	.setData({tmpl_data: {module: '<?=MODULE?>', template: 'users_company'}})
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.query()
+	.setHandler(function(){
+
+		new Graf(this.model.getVal())
+			.sortBy('pos')
+			.each(function(){
+				edit_form.elem.querySelector('select[name="company"]').insertAdjacentHTML('beforeend', '<option value="'+this.title+'">'+this.title+'</option>');
+			});
+	});
+
+//select
+new El('<select name="rank">', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			if(this.model.getVal().value.rank) this.elem.querySelector('option[value="'+this.model.getVal().value.rank+'"]').selected = true;
+		}
+	});
+
+//выпадающий список рангов пользователей
+new El()
+	.setData({tmpl_data: {module: '<?=MODULE?>', template: 'users_rank'}})
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.query()
+	.setHandler(function(){
+		new Graf(this.model.getVal())
+			.sortBy('pos')
+			.each(function(){
+				edit_form.elem.querySelector('select[name="rank"]').insertAdjacentHTML('beforeend', '<option value="'+this.title+'" '+(this.title =='user'?'selected':'')+'>'+this.title+'</option>');
+			});
+	});
+
+//input type=text
+new El('<input type="text" name="weight"/>', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			this.elem.value = this.model.getVal().value.weight || '';
+		}
+	});
+
+new El('<input type="text" name="ip"/>', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.top'))
+	.render().wrap('<li>')
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			this.elem.value = this.model.getVal().value.ip || '';
+		}
+	});
+
+
+//выпадающий блок формы редактирования/добавления, по идее не нужен, но если его не использовать стрелка не совсем корректно отрабатывает
+new El('<li>', edit_form)
+	.setParentNode(edit_form.elem.querySelector('.sub'))
+	.render()
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+		{
+			this.elem.innerHTML = 'Дата регистрации: ' + new Date(+this.model.getVal().value.date_create);
+		}
+		else this.elem.innerHTML = ''; //bug detected - если не затереть значение, то будет установлено время последней редактируемой записи
+	});
+
+
+
+//submit
+new El('<input type="submit" value="Сохранить" class="submit_ok"/>')
+	.setParentNode(edit_form.elem.querySelector('.act'))
+	.render()
+	.on('click', function(){
+		let fd = new FormData(edit_form.elem);
+		if(frontend_data.tmpl_data.event !== 'add') fd.append('id', edit_form.getVal().value.id);
+
+		//контроль данных
+		if(!checkData(fd)) return;
+
+		//запрос пароля
+		if(frontend_data.tmpl_data.event === 'add')
+		{
+			let pass = whatPassword();
+			if(!pass) return;
+			fd.append('pass', pass);
+		}
+
+		frontend_data.form_edit = correctData(fd);
+		content.query();
+		edit_form.setVal({'event':'reset'});
+	});
+
+function checkData(form_data)
+{
+	let iterator = form_data.entries();
+	while(true)
+	{
+		let result = iterator.next();
+		if(result.done) break;
+		
+		switch(result.value[0])
+		{
+			case 'name':
+				if(result.value[1].length < 3)
+				{
+					alert('Слишком короткий логин');
+					return;
+				}
+				if(new RegExp('[^a-zA-Z0-9-_+\s]', 'g').test(result.value[1]))
+				{
+					alert('Логин указан не корректно');
+					return;
+				}
+				break;
+
+			case 'email':
+				if(result.value[1].length < 5)
+				{
+					alert('Слишком короткий e-mail');
+					return;
+				}
+				if(!new RegExp('[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}', 'g').test(result.value[1])) //обратный слеш надо удваивать!!!
+				{
+					alert('e-mail указан не корректно');
+					return;
+				}
+				break;
+		}
+	}
+	return form_data;
+}
+
+function correctData(form_data)
+{
+	let iterator = form_data.entries();
+	while(true)
+	{
+		let result = iterator.next();
+		if(result.done) break;
+		
+		switch(result.value[0])
+		{
+			case 'company': form_data.set(result.value[0], result.value[1] == 'Выбрать компанию' ? '' : result.value[1]); break;
+		}
+	}
+	return form_data;
+}
+
+function whatPassword()
+{
+	let password = prompt('Введите пароль:');
+
+	if(password === null) return; //нажатие кнопки отмена
+
+
+	if(password.length < 3)
+	{
+		alert('ВНИМАНИЕ!!! Пароль содержит меньше 3-х символов');
+		return whatPassword();
+	}
+
+
+	if(new RegExp('[^a-zA-Z0-9-_*?#~%]', 'g').test(password))
+	{
+		alert('Пароль указан не корректно');
+		return whatPassword();
+	}
+
+	return password;
+}
+
+new El('<span class="submit_cancel">Отменить<span/>')
+	.setParentNode(edit_form.elem.querySelector('.act'))
+	.render()
+	.on('click', function(){
+		edit_form.setVal({'event':'reset'});
+	});
+
+new El('<span class="submit_cancel" style="margin-right:35px">Сменить пароль<span/>')
+	.setParentNode(edit_form.elem.querySelector('.act'))
+	.render()
+	.on('click', function(){
+
+		let pass = whatPassword();
+		if(!pass) return;
+		frontend_data.form_edit = {id:edit_form.getVal().value.id, pass:pass};
+			
+		frontend_data.tmpl_data.event = 'change_pass';
+		content.query();
+		edit_form.setVal({'event':'reset'});
+	});
+
+new El('<span class="submit_delete">Удалить<span/>')
+	.setParentNode(edit_form.elem.querySelector('.act'))
+	.render()
+	.on('click', function(){
+		if( !confirm('Вы действительно хотите удалить запись?') ) return;
+		frontend_data.tmpl_data.event = 'del';
+		frontend_data.form_edit = {id:edit_form.getVal().value.id};
+		content.query();
+		edit_form.setVal({'event':'reset'});
+	});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<script>//анимация sub блока
+main.addEventListener('click', function(){
+	let img = event.target.closest('.opt img');
+	if(!img) return;
+
+	let sub = img.parentElement.parentElement.parentElement.querySelector('.sub');
+
+	sub.style.height = sub.scrollHeight+'px';
+
+	//window.getComputedStyle заставляет вычислить новые значения стилей для объекта window, иначе анимация не сработает
+	//Читай здесь:  https://developer.mozilla.org/ru/docs/Web/API/Window/getComputedStyle
+	if(window.getComputedStyle(sub, null).height !== '0px')
+	{
+		sub.style.height = '0px';
+		img.src = '<?=BASE?>/img/double-down.png';
+	}
+	else img.src = '<?=BASE?>/img/double-up.png';
+});
+
+//обработчик устанавливает значение auto после завершения анимации
+main.addEventListener('transitionend', function(){
+	let sub = event.target.closest('.sub');
+	if(!sub) return;
+	if(sub.style.height !== '0px') sub.style.height = "auto";
+});
+</script>
+
+
+
+
+
+
+
+<script>//контроль состояний формы и редактируемой строки
+function checkState(from, to)
+{
+	if(from)
+	{
+		to.querySelector('.sub').style.height = from.querySelector('.sub').style.height;
+		to.querySelector('.opt img').src = from.querySelector('.opt img').src;
+		to.querySelector('.opt input').checked = from.querySelector('.opt input').checked;
+	}
+	else
+	{
+		to.querySelector('.sub').style.height = '0px';
+		to.querySelector('.opt img').src = '<?=BASE?>/img/double-down.png';
+		to.querySelector('.opt input').checked = false;
+	}
+}
+</script>
+
+
+
+
+<script>//подсветка активных строк
+function highLighter()
+{
+	let checkbox_not_checked = main.querySelectorAll('.opt input:not(:checked)'),
+		count_checked = main.querySelectorAll('.opt input:checked').length;
+
+	for(let i = 0; i < checkbox_not_checked.length; i++)
+		checkbox_not_checked[i].parentElement.parentElement.parentElement.style.opacity = count_checked ? 0.7 : 1;
+}
+
+main.addEventListener('click', function(){
+	let input = event.target.closest('.opt input');
+	if(!input) return;
+
+	input.parentElement.parentElement.parentElement.style.opacity = input.checked ? 1 : 0.7;
+	highLighter();
+});
+
+content.setThen(highLighter); //highLighter будет выполнена после оповещения всех подписчиков
+</script>
+
+
+
+
+
+<div id="footer">
+	<span id="foot_select_all">Выделить все</span> /
+	<span id="foot_remove_selection">Снять выделение</span> /
+	<span id="foot_expand">Развернуть</span> /
+	<span id="foot_turn">Свернуть</span> /
+	<span id="foot_stay_on">Оставить выделенное</span>
+	<br><br><br>
+</div>
+<script>//анимация footer блока
+function footerToggle()
+{
+	footer.style.bottom = (!document.body.querySelector('.opt input:checked')) ? -footer.scrollHeight+'px' : '0px';
+}
+
+content.setThen(footerToggle); //footerToggle будет выполнена после оповещения всех подписчиков
+
+main.addEventListener('click', function(){ //клик по опциональному чекбоксу
+	if(event.target.closest('.opt input')) footerToggle();
+});
+</script>
+
+<script> //обработчики событий footer блока
+//выделить всё
+footer.querySelector('#foot_select_all').addEventListener('click', function(){
+	let checkbox_not_checked = document.body.querySelectorAll('.opt input:not(:checked)');
+
+	for(let i = 0; i < checkbox_not_checked.length; i++)
+	{
+		checkbox_not_checked[i].checked = true;
+		checkbox_not_checked[i].parentElement.parentElement.parentElement.style.opacity = 1;
+	}
+});
+
+//снять выделение
+footer.querySelector('#foot_remove_selection').addEventListener('click', function(){
+	let rows = document.body.querySelectorAll('.row:not(#header)');
+
+	for(let i = 0; i < rows.length; i++)
+	{
+		//проверка нужна если есть строка total в шаблоне
+		if(rows[i].querySelector('.opt input')) rows[i].querySelector('.opt input').checked = false;
+		rows[i].style.opacity = 1;
+	}
+	
+	footerToggle();
+});
+
+//развернуть
+footer.querySelector('#foot_expand').addEventListener('click', function(){
+	let checkbox_checked = document.body.querySelectorAll('.opt input:checked');
+
+	for(let i = 0; i < checkbox_checked.length; i++)
+	{
+		let sub = checkbox_checked[i].parentElement.parentElement.parentElement.querySelector('.sub');
+		sub.style.height = sub.scrollHeight+'px';
+		checkbox_checked[i].parentElement.parentElement.querySelector('.opt img').src = '<?=BASE?>/img/double-up.png';
+	}
+});
+
+//свернуть
+footer.querySelector('#foot_turn').addEventListener('click', function(){
+	let checkbox_checked = document.body.querySelectorAll('.opt input:checked');
+
+	for(let i = 0; i < checkbox_checked.length; i++)
+	{
+		let sub = checkbox_checked[i].parentElement.parentElement.parentElement.querySelector('.sub');
+		sub.style.height = sub.scrollHeight+'px';
+		window.getComputedStyle(sub, null).height;
+		sub.style.height = '0px';
+		checkbox_checked[i].parentElement.parentElement.querySelector('.opt img').src = '<?=BASE?>/img/double-down.png';
+	}
+});
+
+//оставить выделенное
+footer.querySelector('#foot_stay_on').addEventListener('click', function(){
+	let checkbox_not_checked = document.body.querySelectorAll('.opt input:not(:checked)');
+
+	//для обновления представления формируется псевдо-ответ сервера
+	let pseudo_answer = {
+		main_data: [],
+		meta_data: {event: 'del'}
+	};
+
+	//ninja code
+	//здесь записывается в псевдо-массив ответа сервера id записей, соответствующие id из БД
+	for(let i = 0; i < checkbox_not_checked.length; i++)
+		pseudo_answer.main_data.push({id: content.observers[ checkbox_not_checked[i].parentElement.parentElement.parentElement.getAttribute('id') ].value.id});
+
+	content.setVal(pseudo_answer); //обновление представления
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script>//прокрутка и прелоадер
+let preload = new El('<p>please wait...</p>', content)
+	.setParentNode(content.elem)
+	.setHandler(function(){
+		this.elem.remove();
+
+		if( this.model.getVal().main_data && this.model.getVal().main_data.length ) this.answer_backend = false;
+	})
+	.render();
+
+window.addEventListener('scroll', function(){
+	if(document.documentElement.getBoundingClientRect().bottom - document.documentElement.clientHeight < 150)
+	{
+		if(!preload.answer_backend)
+		{
+			preload.answer_backend = true;
+			preload.render();
+			frontend_data.tmpl_data.event = 'load';
+			frontend_data.tmpl_data.start += frontend_data.tmpl_data.limit;
+			content.query();
+		}
+	}
+});
+</script>
+
+</body>
+</html>

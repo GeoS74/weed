@@ -1,0 +1,17 @@
+<?
+$file_name = $url -> getPath(1);
+$file_path = ABS_PATH.'/files/gsp/documents/'.$file_name;
+
+//запрет кэширования
+header("Cache-Control: no-store, no-cache, must-revalidate"); // HTTP/1.1 
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Дата в прошлом
+header("Pragma: no-cache"); // HTTP/1.1 
+header("Last-Modified: ".gmdate("D, d M Y H:i:s")."GMT");
+
+//header('Content-Type: '.$row['file_type']); //если раскомментировать эту строку, то программа отработает, но в консоли будет предупреждение:
+										      //"Ресурс интерпретируется как Документ, но передается с приложением / октет-поток MIME-типа"
+header('Content-Disposition: attachment; filename="'.$file_name.'"');
+
+readfile($file_path);
+exit();
+?>

@@ -1,0 +1,136 @@
+/*gentleman style*/
+
+body{font-size:14px; font-family:'Arimo'; color:#424242; width:100%; height:100%;}
+
+h1{font-size:2em; margin:35px 20px; cursor:default;}
+
+h2{}
+
+h3{display:inline-block; font-size:1.5em; margin:15px 20px;}
+h3 a{color:#424242; text-decoration:none;}
+h3 a:hover{color:#3F51B5;}
+
+p{font-size:0.9em; margin:15px 20px;}
+
+form{margin:20px;}
+
+a{color:#424242; cursor:pointer; text-decoration:underline;}
+a:hover{color:#3F51B5; text-decoration:none;}
+
+
+h1::selection,
+h2::selection,
+h3::selection,
+p::selection,
+a::selection,
+i::selection,
+b::selection,
+td::selection,
+ul::selection,
+li::selection,
+input::selection,
+label::selection,
+form::selection,
+img::selection,
+span::selection,
+textarea::selection{background:#757575; color:#F5F5F5}
+
+#user{position: absolute; top: 20px; right: 20px; color: #F5F5F5; z-index: 100501;}
+
+#user a{color:#F5F5F5;}
+
+#user a:hover{text-decoration: none;}
+
+#content{}
+
+#main_content{padding-bottom:150px;}
+
+#searchPng{width:15px; cursor:pointer;}
+
+#header{background: #757575; color: #F5F5F5; cursor:default;}
+
+.date_create_el{position: absolute; right: 15px; bottom: 0px;}
+
+.page{position:relative; margin:0 20px; border:1px solid #BDBDBD; border-bottom:0px;}
+
+
+/*inputs style*/
+
+input[type='text'],
+input[type='search']{border:1px solid #bdbdbd;}
+
+input:focus{border-color:#336699;}
+
+input[name='code']{width:58px;}
+
+input, textarea, select{padding:5px; margin:0 5px;}
+
+label:hover{color:#3F51B5; cursor:pointer;}
+
+/*buttons style*/
+
+.button_edit_data,
+.button_cancel_data,
+.button_delete_data{font-size: 0.9em; cursor: pointer;}
+	
+.button_add_data{width:70px; padding:0 5px 5px 5px; cursor:pointer; text-decoration:underline; }
+
+.button_add_data:hover{color:#3F51B5; text-decoration:none;}
+
+.button_edit_data{
+	  margin:3px 10px;
+	  padding:5px 25px;
+	  background-color:#3F51B5;
+	  border:0px;
+	  border-radius:5px;
+	  color:white; 
+	}
+
+.button_edit_data:hover{background-color:#283593;}
+
+.button_cancel_data{color:#3F51B5}
+ 
+.button_cancel_data:hover{color:#F44336;}
+
+.button_delete_data{border:0px; color:#F44336; margin-left:25px;}
+
+.button_delete_data:hover{color:#3F51B5;}
+
+/*filters style*/
+
+.active{background:#757575; color:#F5F5F5; cursor:default;}
+
+
+/*color*/
+
+.page:nth-child(2n+1){background:#F5F5F5;}
+
+
+/*excel_pic*/
+
+#excel_pic{position:absolute; left:20px;}
+
+#excel_pic:hover{cursor:pointer;}
+
+
+/*print style*/
+
+@media print{
+body{background: white;}
+
+#content{width: 100%; font-size:0.9em;}
+
+h1,
+.date_create_el,
+.infographics,
+.menu,
+#user,
+#srch_form,
+.button_add_data,
+#foot_menu{display: none;}
+
+.page:not(#header) .opt_page {opacity: 0;}
+
+tr{page-break-after:avoid;} /*запрет разделять строку между страницами Важно! Запись page-break-after: avoid не поддерживается в Chrome*/
+.page{page-break-inside:avoid;} /*Разрешает или запрещает разрыв страницы внутри элемента при печати*/
+}

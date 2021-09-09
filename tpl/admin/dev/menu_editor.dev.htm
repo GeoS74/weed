@@ -1,0 +1,326 @@
+<!DOCTYPE HTML> 
+<html lang="ru">
+<head>
+  <title><?=PAGE_TITLE?></title>
+  <? include_once ROOT_PATH.'/tpl/common/header.htm'; ?>
+<style>
+form{margin: 20px;}
+#content{margin: 20px;}
+#content li{margin: 10px;}
+input[type=text],
+select,
+label{margin-right:8px;}
+input[name=title]{width:250px;}
+input[name=pos]{width:50px;}
+
+
+/*стили для визуализации меню*/
+#menu_view li{position: relative;}
+
+#menu_view li:hover{background: white;}
+
+#menu_view li:hover > a,
+#menu_view li:hover > span{color: #424242;}
+
+#menu_view span{cursor:default;}
+
+#menu_view span,
+#menu_view a{display: block; padding: 18px 18px 18px 18px; color: #F5F5F5;}
+
+#menu_view a{text-decoration: none;}
+
+#menu_view .sub_menu{
+  position: absolute;
+  top: 50px;
+  visibility: hidden;
+  opacity: 0; 
+}	
+
+#menu_view .sub_menu .sub_menu{
+  margin-left: 0px;
+  left: 100%;
+  top: 0px;
+}
+
+#menu_view li:hover > .sub_menu {
+  visibility: visible;
+  opacity: 1;
+}
+</style>
+<script type="text/javascript" src="<?=BASE?>/lib/dev/Elementary.js"></script>
+<script type="text/javascript" src="<?=BASE?>/js/class/Graf.js"></script>
+</head>
+<body>
+<?include_once ROOT_PATH.'/tpl/common/hellouser.htm';?>
+
+<?include_once ROOT_PATH.'/tpl/common/menu.htm';?>
+
+
+<h1><?=PAGE_TITLE?></h1>
+
+<form method="post" id="add_form">
+    <input type="text" name="title" placeholder="Новая запись..." autofocus/>
+    <input type="text" name="alias" placeholder="URL-адрес..." autofocus/>
+    <select name="parent_id"></select>
+    <input type="text" name="pos" placeholder="Поз."/>
+	<input type="checkbox" name="limited" id="ch_1" /><label for="ch_1">ограничить</label>
+	<input type="checkbox" name="hidden" id="ch_2" /><label for="ch_2">скрыть</label>
+    <input type="submit" value="Сохранить" class="submit_ok"/>	
+</form>
+<script>//submit add_form
+add_form.addEventListener('submit', function(){
+	event.preventDefault();
+	frontend_data.tmpl_data.event = 'add';
+	frontend_data.form_data = new FormData(this);
+	backend.query();
+	this.reset();
+});
+</script>
+
+
+<script>//frontend data for request
+let frontend_data = {
+		tmpl_data: {
+			module: '<?=MODULE?>',
+			template:   '<?=TMPL_NAME?>',
+			event: '',
+		},
+		form_data: {},
+	};
+
+let backend = new El() //main object for backend request
+	.setPath('<?=BACKEND_CONTROLLER?>')
+	.setData(frontend_data)
+	.query();
+</script>
+
+
+<script>//create dropdown list for all forms
+new El(null, backend)
+	.setHandler(function(){
+		let option = optionHtml({id: 0, title: 'Выбрать группу', level: 1});
+		
+		new Graf(this.model.getVal())
+			.sortBy('pos')
+			.each(function(){
+				option += optionHtml(this);
+			});
+		
+		add_form.querySelector('select[name="parent_id"]').innerHTML = option;
+		edit_form.elem.querySelector('select[name="parent_id"]').innerHTML = option;
+	});
+function optionHtml(data)
+{
+	return '<option value="'+data.id+'" data-level="'+data.level+'">'+prefix(data.level)+data.title+'</option>';
+}
+
+//common function
+function prefix( freq )
+{
+	for( var i = 0, prefix = '|-'; i < freq; i++ ) prefix += '---';
+	return prefix;
+}
+</script>
+
+
+<script>//main container
+let content = new El('<ul id="content">', backend)
+	.render()
+	.setHandler(function(){
+		this.elem.innerHTML = '';
+		this.observers = [];
+	
+		let self = this; //чтобы при переборе элементов графа не потерять this
+		let graf = new Graf(this.model.getVal())
+			.sortBy('pos')
+			.each(function(){		
+				//в качестве id для строки используется индекс позиции в массиве подписчиков self.observers
+				new El(liHtml(this, self.observers.length), self)
+					.setParentNode(self.elem)
+					.setVal(this)
+					.render();
+			});
+
+		//визуализация меню
+		document.body.querySelector('#menu_view').innerHTML = makeMenu(graf.getGraf());
+	})
+	.on('dblclick', function(){
+		let li = event.target.closest('li');
+		if(!li) return;
+
+		li.hidden = true;
+
+		edit_form
+			.setVal({'event':'reset'})
+			.setVal({'event':'fill', 'value':content.observers[li.getAttribute('id')].getVal()})
+			.setParentNode(li)
+			.render('afterend');
+	});
+
+function liHtml(data, id_observer)
+{
+	let li = '<li id="'+id_observer+'">';
+	li += data.level == 1 ? '<b>'+prefix(data.level) + data.title+'</b>' : prefix(data.level) + data.title;
+	if(data.limited == 1) li += '<small style="font-size:0.7em; padding-left: 5px; color: red; ">private</small> ';
+	if(data.hidden == 1) li += '<small style="font-size:0.7em; padding-left: 5px; background-color: yellow; ">limited</small>';
+	if(data.alias) li += '<small style="font-size:0.8em; padding-left: 35px;">'+data.alias+'</small>';
+	li += '</li>';
+	return li;
+}
+
+function makeMenu(obj, subMenu)
+{
+  subMenu = subMenu || false;
+
+  let menu = !subMenu ? '<ul class="top_menu">' : '<ul class="sub_menu">';
+
+  for(let key in obj )
+  {
+	menu += '<li>';
+
+	if(obj[key].alias) menu += '<a href="' + obj[key].alias +'">' + obj[key].title + '</a>';
+    else menu += '<span>' + obj[key].title + '</span>';
+
+	if(obj[key].next != null)  menu += makeMenu(obj[key].next, true);
+
+	menu += '</li>';
+  }
+  return menu += '</ul>';
+}
+</script>
+
+
+<script>//edit_form
+let edit_form = new El('<form id="edit_form">')
+	.on('submit', function(){event.preventDefault()})
+	.setHandler(function(){
+		if(this.getVal().event == 'reset')
+		{
+			if( this.elem.previousElementSibling ) this.elem.previousElementSibling.hidden = false;
+			this.elem.reset();
+			this.elem.remove();
+		}
+	});
+
+//text
+new El('<input type=text name="title" placeholder="Изменить запись..."/>', edit_form)
+	.setParentNode(edit_form.elem)
+	.render()
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+			if(this.model.getVal().value.title) this.elem.value = this.model.getVal().value.title;
+	});
+
+//text
+new El('<input type=text name="alias" placeholder="Изменить URL..."/>', edit_form)
+	.setParentNode(edit_form.elem)
+	.render()
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+			if(this.model.getVal().value.alias) this.elem.value = this.model.getVal().value.alias;
+	});
+
+//select
+new El('<select name="parent_id">', edit_form)
+	.setParentNode(edit_form.elem)
+	.render()
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //установка активного элемента
+		{
+			if(this.model.getVal().value.parent_id)
+			{
+				this.elem.querySelector('option[value="'+this.model.getVal().value.parent_id+'"]').selected = true;
+
+				//активация элементов
+				for(let i = 0, nodes = this.elem.childNodes; i < nodes.length; i++) nodes[i].disabled = false;
+
+				//деактивация элементов
+				let option = this.elem.querySelector('option[value="'+this.model.getVal().value.id+'"]');
+					option.disabled = true;
+				var level = option.dataset.level;
+				
+				while(option = option.nextElementSibling)
+				{
+					if(option.dataset.level <= level) break;
+					option.disabled = true;
+				}
+			}
+		}
+	});
+
+//text
+new El('<input type=text name="pos" placeholder="Поз."/>', edit_form)
+	.setParentNode(edit_form.elem)
+	.render()
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+			if(this.model.getVal().value.pos) this.elem.value = this.model.getVal().value.pos;
+	});
+
+//checkbox
+new El('<input type="checkbox" name="limited" id="ch_3" />', edit_form)
+	.setParentNode(edit_form.elem)
+	.render()
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+			if(this.model.getVal().value.limited == 1) this.elem.checked = true;
+	})
+	.render(null, '<label for="ch_3">Ограничить</label>');
+
+new El('<input type="checkbox" name="hidden" id="ch_4" />', edit_form)
+	.setParentNode(edit_form.elem)
+	.render()
+	.setHandler(function(){
+		if(this.model.getVal().event == 'fill') //заполнение значениями
+			if(this.model.getVal().value.hidden == 1) this.elem.checked = true;
+	})
+	.render(null, '<label for="ch_4">Скрыть</label>');
+
+
+
+
+
+
+//submit send
+new El('<input type="submit" value="Сохранить" class="submit_ok"/>')
+	.setParentNode(edit_form.elem)
+	.render()
+	.on('click', function(){
+		frontend_data.tmpl_data.event = 'upd';
+		let fd = new FormData(edit_form.elem);
+		fd.append('id', edit_form.getVal().value.id);
+		frontend_data.form_data = fd;
+		backend.query();
+		edit_form.setVal({'event':'reset'});
+	});
+	
+
+
+
+
+//submit cancel
+new El('<span class="submit_cancel">Отмена<span/>')
+	.setParentNode(edit_form.elem)
+	.render()
+	.on('click', function(){
+		edit_form.setVal({'event':'reset'});
+	});
+
+//submit delete
+new El('<span class="submit_delete">Удалить<span/>')
+	.setParentNode(edit_form.elem)
+	.render()
+	.on('click', function(){
+		if( !confirm('Вы действительно хотите удалить запись?') ) return;
+		frontend_data.tmpl_data.event = 'del';
+		frontend_data.form_data = {id:edit_form.getVal().value.id};
+		backend.query();
+		edit_form.setVal({'event':'reset'});
+	});
+</script>
+
+<h2>Внешний вид меню:</h2>
+
+<div id="menu_view"></div>
+</body>
+</html>
